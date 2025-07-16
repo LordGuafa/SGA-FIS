@@ -1,0 +1,38 @@
+{
+  "name": "sga-fis",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LordGuafa/SGA-FIS.git"
+  },
+  "author": "LordGuafa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LordGuafa/SGA-FIS/issues"
+  },
+  "homepage": "https://github.com/LordGuafa/SGA-FIS#readme",
+  "description": "",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.0",
+    "esm": "^3.2.25",
+    "express": "^5.1.0",
+    "express-jwt": "^8.5.1",
+    "module": "^1.1.0",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/express-jwt": "^6.0.4",
+    "@types/node": "^24.0.14",
+    "@types/pg": "^8.15.4",
+    "typescript": "^5.8.3"
+  }
+}
