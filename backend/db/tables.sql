@@ -1,3 +1,5 @@
+CREATE DATABASE IF NOT EXISTS SGA;
+
 -- Tabla de departamentos
 CREATE TABLE departamentos (
     id SERIAL CONSTRAINT pk_departamentos PRIMARY KEY,
@@ -35,6 +37,28 @@ CREATE TABLE cursos (
     descripcion TEXT,
     modalidad VARCHAR(20) NOT NULL,
     CONSTRAINT chk_cursos_modalidad CHECK (modalidad IN ('sincrónica', 'autónoma'))
+);
+-- Relación entre tutores y cursos (para ambos tipos de modalidad)
+CREATE TABLE tutores_curso (
+    id SERIAL CONSTRAINT pk_tutores_curso PRIMARY KEY,
+    tutor_id INTEGER NOT NULL,
+    curso_id INTEGER NOT NULL,
+    CONSTRAINT fk_tutores_curso_tutor FOREIGN KEY (tutor_id) REFERENCES tutores(id_usuario) ON DELETE CASCADE,
+    CONSTRAINT fk_tutores_curso_curso FOREIGN KEY (curso_id) REFERENCES cursos(id) ON DELETE CASCADE,
+    CONSTRAINT uq_tutores_curso UNIQUE (tutor_id, curso_id)
+);
+
+-- Avance de participantes en cursos autónomos
+CREATE TABLE avance_autonomo (
+    id SERIAL CONSTRAINT pk_avance_autonomo PRIMARY KEY,
+    participante_id INTEGER NOT NULL,
+    curso_id INTEGER NOT NULL,
+    porcentaje_avance NUMERIC(5,2) NOT NULL CHECK (porcentaje_avance BETWEEN 0 AND 100),
+    fecha_actualizacion DATE NOT NULL DEFAULT CURRENT_DATE,
+    observaciones TEXT,
+    CONSTRAINT fk_avance_autonomo_participante FOREIGN KEY (participante_id) REFERENCES participantes(id_usuario) ON DELETE CASCADE,
+    CONSTRAINT fk_avance_autonomo_curso FOREIGN KEY (curso_id) REFERENCES cursos(id) ON DELETE CASCADE,
+    CONSTRAINT uq_avance_autonomo UNIQUE (participante_id, curso_id)
 );
 
 -- Inscripciones

@@ -94,12 +94,35 @@ FROM clases cl
 JOIN calificaciones cal ON cal.curso_id = cl.curso_id
 JOIN cursos cu ON cu.id = cl.curso_id;
 
+CREATE VIEW vista_avance_autonomo_tutor AS
+SELECT
+    tc.tutor_id,
+    a.participante_id,
+    u.nombre_completo AS nombre_participante,
+    c.id AS curso_id,
+    c.nombre AS curso,
+    a.porcentaje_avance,
+    a.fecha_actualizacion,
+    a.observaciones
+FROM avance_autonomo a
+JOIN cursos c ON c.id = a.curso_id
+JOIN tutores_curso tc ON tc.curso_id = c.id
+JOIN usuarios u ON u.id = a.participante_id
+WHERE c.modalidad = 'autónoma';
+
+
 --Permisos para las vistas
 -- Participantes
 GRANT SELECT ON vista_cursos_participante, vista_calificaciones_participante, vista_asistencia_participante TO rol_participante;
 
 -- Tutores
 GRANT SELECT ON vista_clases_tutor, vista_participantes_tutor, vista_asistencias_tutor, vista_calificaciones_tutor TO rol_tutor;
+-- Permitir a tutores ver y actualizar el avance
+GRANT SELECT, INSERT, UPDATE ON avance_autonomo TO rol_tutor;
+GRANT SELECT ON vista_avance_autonomo_tutor TO rol_tutor;
+GRANT SELECT, INSERT, UPDATE ON calificaciones, asistencias TO rol_tutor;
+
+
 
 -- Administrativos
 GRANT SELECT ON vista_usuarios, vista_inscripciones, vista_calificaciones_completas, vista_clases_y_asistencia TO rol_administrativo;
