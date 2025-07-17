@@ -4,5 +4,4 @@ export interface IUser{
     email: string;
     password: string;
     role: "admin" | "tutor" | "participante";
-    opcional?:string
 }

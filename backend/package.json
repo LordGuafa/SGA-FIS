@@ -1,12 +1,12 @@
 {
   "name": "sga-fis",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
   },
   "repository": {
     "type": "git",
@@ -23,10 +23,8 @@
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
-    "esm": "^3.2.25",
     "express": "^5.1.0",
     "express-jwt": "^8.5.1",
-    "module": "^1.1.0",
     "pg": "^8.16.3"
   },
   "devDependencies": {
@@ -36,6 +34,7 @@
     "@types/express-jwt": "^6.0.4",
     "@types/node": "^24.0.14",
     "@types/pg": "^8.15.4",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
   }
 }
