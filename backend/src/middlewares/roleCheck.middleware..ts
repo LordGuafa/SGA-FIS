@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 declare global {
     namespace Express {
         interface Request {
-            auth?: { role?: string };
+            auth?: { role?: number };
         }
     }
 }

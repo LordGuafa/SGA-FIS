@@ -1,22 +1,29 @@
-import {IUser} from '../../interfaces/user';
-export class Participante implements IUser{
+import { IUser } from "../../interfaces/user";
+export class Participante implements IUser {
   id: number;
   username: string;
   email: string;
   password: string;
-  role: "admin" | "tutor" | "participante";
+  contactNumber1: string;
+  contactNumber2?: string;
+  departmentId: number;
+  role: 1 | 2 | 3 = 3;
 
   constructor(
     id: number,
     username: string,
     email: string,
     password: string,
-    role: "admin" | "tutor" | "participante" = "participante",
+    department: number,
+    contactNumber1: string,
+    contactNumber2?: string
   ) {
     this.id = id;
     this.username = username;
     this.email = email;
     this.password = password;
-    this.role = role;
+    this.contactNumber1 = contactNumber1;
+    this.contactNumber2 = contactNumber2;
+    this.departmentId = department;
   }
 }
