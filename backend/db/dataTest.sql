@@ -1,53 +1,162 @@
 -- Catálogos
-INSERT INTO catalogo_rol (nombre) VALUES 
-('administrativo'), ('tutor'), ('participante');
+INSERT INTO
+    catalogo_rol (nombre)
+VALUES ('administrativo'),
+    ('tutor'),
+    ('participante');
 
-INSERT INTO catalogo_departamento (nombre, codigo_ocad, region_ocad) VALUES
-('Antioquia', '05', 'Noroeste'),
-('Cundinamarca', '25', 'Centro'),
-('Valle del Cauca', '76', 'Suroccidente');
+INSERT INTO
+    catalogo_modalidad (nombre)
+VALUES ('sincronica'),
+    ('autonoma');
 
-INSERT INTO catalogo_modalidad (nombre) VALUES 
-('sincronica'), ('autonoma');
+INSERT INTO
+    catalogo_departamento (
+        nombre,
+        codigo_ocad,
+        region_ocad
+    )
+VALUES (
+        'Antioquia',
+        '05-001',
+        'Región Centro'
+    ),
+    (
+        'Cundinamarca',
+        '25-002',
+        'Región Centro'
+    ),
+    (
+        'Valle del Cauca',
+        '76-003',
+        'Región Pacífico'
+    );
 
 -- Personal
-INSERT INTO personal (id, nombre, correo, contrasena, rol_id) VALUES
-(101, 'Laura Gómez', 'laura@admin.edu.co', 'admin123', 1),
-(201, 'Carlos Ruiz', 'carlos@tutor.edu.co', 'tutor456', 2),
-(202, 'Ana Torres', 'ana@tutor.edu.co', 'tutor789', 2);
+INSERT INTO
+    personal (
+        id,
+        nombre,
+        correo,
+        contrasena,
+        telefono1,
+        telefono2,
+        rol_id
+    )
+VALUES (
+        1001,
+        'María Gómez',
+        'maria.gomez@educa.com',
+        'maria123',
+        '3001112233',
+        '3102223344',
+        2
+    ), -- tutor
+    (
+        1002,
+        'Carlos Ruiz',
+        'carlos.ruiz@educa.com',
+        'carlos456',
+        '3011111122',
+        '3123334455',
+        1
+    );
+-- administrativo
 
 -- Participantes
-INSERT INTO participante (id, nombre, correo, contrasena, departamento_id) VALUES
-(301, 'Pedro Martínez', 'pedro@estudiante.edu.co', 'clave123', 1),
-(302, 'Lucía Díaz', 'lucia@estudiante.edu.co', 'clave456', 2),
-(303, 'Mateo López', 'mateo@estudiante.edu.co', 'clave789', 3);
+INSERT INTO
+    participante (
+        id,
+        nombre,
+        correo,
+        contrasena,
+        telefono1,
+        telefono2,
+        departamento_id,
+        rol_id
+    )
+VALUES (
+        2001,
+        'Luis Pérez',
+        'luis.perez@correo.com',
+        'luispass',
+        '3112223344',
+        '3203334455',
+        1,
+        3
+    ),
+    (
+        2002,
+        'Ana Torres',
+        'ana.torres@correo.com',
+        'anapass',
+        '3134445566',
+        '3215556677',
+        2,
+        3
+    );
 
--- Cursos
-INSERT INTO curso (nombre, descripcion) VALUES
-('Matemáticas I', 'Curso de fundamentos matemáticos'),
-('Historia Universal', 'Estudio de las civilizaciones antiguas');
+-- Curso
+INSERT INTO
+    curso (nombre, descripcion)
+VALUES (
+        'Matemáticas Básicas',
+        'Curso de fundamentos matemáticos para todos los niveles'
+    );
 
--- Clases
-INSERT INTO clase (curso_id, tutor_id, fecha, tema) VALUES
-(1, 201, '2025-07-01', 'Álgebra básica'),
-(2, 202, '2025-07-02', 'Mesopotamia');
+-- Clase
+INSERT INTO
+    clase (
+        curso_id,
+        tutor_id,
+        fecha,
+        tema
+    )
+VALUES (
+        1,
+        1001,
+        '2025-07-10',
+        'Números enteros y operaciones'
+    );
 
--- Inscripciones
-INSERT INTO inscripcion (curso_id, participante_id, modalidad_id) VALUES
-(1, 301, 1), -- Pedro - Matemáticas I - sincrónica
-(1, 302, 2), -- Lucía - Matemáticas I - autónoma
-(2, 303, 1); -- Mateo - Historia Universal - sincrónica
+-- Inscripción
+INSERT INTO
+    inscripcion (
+        curso_id,
+        participante_id,
+        modalidad_id
+    )
+VALUES (1, 2001, 1), -- Luis en modalidad sincronica
+    (1, 2002, 2);
+-- Ana en modalidad autonoma
 
--- Avances autónomos
-INSERT INTO avance_autonomo (inscripcion_id, descripcion, fecha) VALUES
-(2, 'Lucía completó el módulo 1', '2025-07-03');
+-- Avance autónomo
+INSERT INTO
+    avance_autonomo (inscripcion_id, descripcion)
+VALUES (
+        2,
+        'Estudió el material de introducción a las fracciones'
+    );
 
--- Asistencias
-INSERT INTO asistencia (clase_id, participante_id, presente) VALUES
-(1, 301, TRUE),
-(2, 303, FALSE);
+-- Asistencia y calificación
+INSERT INTO
+    asistencia (
+        clase_id,
+        participante_id,
+        presente
+    )
+VALUES (1, 2001, TRUE);
 
--- Calificaciones
-INSERT INTO calificacion (clase_id, participante_id, nota, observaciones) VALUES
-(1, 301, 85.5, 'Buen desempeño'),
-(2, 303, 70.0, 'Debe mejorar la asistencia');
+INSERT INTO
+    calificacion (
+        clase_id,
+        participante_id,
+        nota,
+        observaciones
+    )
+VALUES (
+        1,
+        2001,
+        88.5,
+        'Buen desempeño'
+    );

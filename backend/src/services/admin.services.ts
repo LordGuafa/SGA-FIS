@@ -1,4 +1,4 @@
-import { db } from "../config/db";
+import { pool } from "../config/db";
 import { Admin } from "../models/personas/admin";
 import { Participante } from "../models/personas/participante";
 import { Tutor } from "../models/personas/tutor";
@@ -10,7 +10,7 @@ import { config } from "../config/config";
 
 export class AdminServices implements IUserServices {
   async login(email: string, password: string): Promise<string | null> {
-    const res = await db.query(
+    const res = await pool.query(
       "SELECT * FROM personal WHERE correo = $1 and role_id = 1",
       [email]
     );
@@ -42,7 +42,7 @@ export class AdminServices implements IUserServices {
     oldPassword: string,
     newPassword: string
   ): Promise<Boolean> {
-    const query = await db.query(
+    const query = await pool.query(
       "SELECT * FROM personal WHERE id = $1 AND role_id = 1",
       [id]
     );
@@ -54,43 +54,127 @@ export class AdminServices implements IUserServices {
     if (!isOldPasswordValid) {
       return false;
     }
-    const hashedNewPassword = await bcrypt.hash(newPassword, config.SALT_ROUNDS);
-    await db.query("UPDATE personal SET password = $1 WHERE id = $2", [
+    const hashedNewPassword = await bcrypt.hash(
+      newPassword,
+      config.SALT_ROUNDS
+    );
+    await pool.query("UPDATE personal SET password = $1 WHERE id = $2", [
       hashedNewPassword,
       id,
     ]);
     return true;
+  }
+
+  async createParticipante(participante: Participante): Promise<Participante> {
+    const hashedPassword = await bcrypt.hash(
+      participante.password,
+      config.SALT_ROUNDS
+    );
+    const res = await pool.query(
+      "INSERT INTO participante (nombre, correo, password, contacto_1, contacto_2, departamento_id, rol_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+      [
+        participante.username,
+        participante.email,
+        hashedPassword,
+        participante.contactNumber1,
+        participante.contactNumber2,
+        participante.departmentId,
+        participante.role,
+      ]
+    );
+    return res.rows[0];
+  }
+
+  async createTutor(newTutor: Tutor): Promise<Tutor> {
+    const hashedPassword = await bcrypt.hash(
+      newTutor.password,
+      config.SALT_ROUNDS
+    );
+    const res = await pool.query(
+      "INSERT INTO participante (nombre, correo, password, contacto_1, contacto_2, departamento_id, rol_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+      [
+        newTutor.username,
+        newTutor.email,
+        hashedPassword,
+        newTutor.contactNumber1,
+        newTutor.contactNumber2,
+        newTutor.role,
+      ]
+    );
+    return res.rows[0];
+  }
+
+  async updateParticipante(
+    id: number,
+    participante: Partial<Participante>
+  ): Promise<Participante | null> {
+    const fields = [];
+    const values = [];
+    let index = 1;
+    for (const [key, value] of Object.entries(participante)) {
+      fields.push(`${key} = $${index}`);
+      values.push(value);
+      index++;
     }
-    
-    async createParticipante(participante:Participante): Promise<Participante>{
-        const hashedPassword = await bcrypt.hash(participante.password, config.SALT_ROUNDS);
-        const res = await db.query(
-            "INSERT INTO participante (nombre, correo, password, contacto_1, contacto_2, departamento_id, rol_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-            [
-                participante.username,
-                participante.email,
-                hashedPassword,
-                participante.contactNumber1,
-                participante.contactNumber2,
-                participante.departmentId,
-                participante.role
-            ]
-        );
-        return res.rows[0];
+    values.push(id);
+    const res = await pool.query(
+      `UPDATE participante SET ${fields.join(
+        ", "
+      )} WHERE id = $${index} RETURNING *`,
+      values
+    );
+    return res.rows[0] || null;
+  }
+
+  async updatePersonal(
+    id: number,
+    tutor: Partial<Tutor>
+  ): Promise<Tutor | null> {
+    const fields = [];
+    const values = [];
+    let index = 1;
+    for (const [key, value] of Object.entries(tutor)) {
+      fields.push(`${key} = $${index}`);
+      values.push(value);
+      index++;
     }
-    async createTutor(newTutor:Tutor): Promise<Tutor>{
-        const hashedPassword = await bcrypt.hash(newTutor.password, config.SALT_ROUNDS);
-        const res = await db.query(
-            "INSERT INTO participante (nombre, correo, password, contacto_1, contacto_2, departamento_id, rol_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-            [
-                newTutor.username,
-                newTutor.email,
-                hashedPassword,
-                newTutor.contactNumber1,
-                newTutor.contactNumber2,
-                newTutor.role
-            ]
-        );
-        return res.rows[0];
-    }
+    values.push(id);
+    const res = await pool.query(
+      `UPDATE personal SET ${fields.join(
+        ", "
+      )} WHERE id = $${index} RETURNING *`,
+      values
+    );
+    return res.rows[0] || null;
+  }
+
+  async getParticipantes(): Promise<Participante[]> {
+    const res = await pool.query("SELECT * FROM participante");
+    return res.rows;
+  }
+
+  async getPersonal(): Promise<Tutor[]> {
+    const res = await pool.query("SELECT * FROM personal WHERE role_id = 2");
+    return res.rows;
+  }
+
+  async getParticipanteById(id: number): Promise<Participante | null> {
+    const res = await pool.query("SELECT * FROM participante WHERE id = $1", [
+      id,
+    ]);
+    return res.rows[0] || null;
+  }
+
+  async getTutorById(id: number): Promise<Tutor | null>{
+    const res = await pool.query("SELECT * FROM personal WHERE id = $1 AND role_id = 2", [id]);
+    return res.rows[0] || null;
+  }
+
+  async deleteParticipante(id: number): Promise<void> {
+    const res = await pool.query("DELETE FROM participante WHERE id = $1", [id]);
+  }
+
+  async deletePersonal(id: number): Promise<void> {
+    const res = await pool.query("DELETE FROM personal WHERE id = $1", [id]);
+  }
 }
