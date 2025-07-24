@@ -6,7 +6,11 @@ import { AdminController } from "../controllers/admin.controller";
 const adminRouter = Router();
 const adminController = new AdminController();
 
+
+adminRouter.post("/login", adminController.login);
+
 // Solo administradores (rol 1) pueden acceder a estas rutas
+
 adminRouter.use(authMiddleware);
 
 // Participantes

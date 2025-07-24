@@ -7,7 +7,7 @@ export class Participante implements IUser {
   contactNumber1: string;
   contactNumber2?: string;
   departmentId: number;
-  role: 1 | 2 | 3 = 3;
+  rol_id: 1 | 2 | 3 = 3;
 
   constructor(
     id: number,

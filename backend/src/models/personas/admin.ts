@@ -7,7 +7,7 @@ export class Admin implements IUser {
   password: string;
   contactNumber1: string;
   contactNumber2?: string; // Optional contact number
-  role: 1 | 2 | 3 = 1;
+  rol_id: 1 | 2 | 3 = 1;
 
   constructor(
     id: number,

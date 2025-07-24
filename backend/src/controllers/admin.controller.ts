@@ -4,6 +4,12 @@ import { AdminServices } from "../services/admin.services";
 export class AdminController {
   private services = new AdminServices();
 
+  login = async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+    const token = await this.services.login(email, password);
+    if (!token) return res.status(401).json({ message: 'Invalid credentials' });
+    res.status(200).json({ token });
+  }
   getParticipantes = async (_: Request, res: Response) => {
     const participantes = await this.services.getParticipantes();
     res.status(200).json(participantes);

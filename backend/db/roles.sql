@@ -1,47 +1,46 @@
--- Crear el rol con contraseña (puedes cambiar 'securepassword')
-CREATE ROLE app_user LOGIN PASSWORD 'securepassword';
+-- Crear el rol si no existe
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'app_user') THEN
+        CREATE ROLE app_user LOGIN PASSWORD 'password_segura';
+    END IF;
+END
+$$;
 
--- No se le otorgan permisos de superusuario ni de creación
-ALTER ROLE app_user NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT;
+-- Permitir conexión a la base y uso del esquema
+GRANT CONNECT ON DATABASE sga TO app_user;
+GRANT USAGE ON SCHEMA public TO app_user;
 
--- Otorgar acceso a lectura y escritura solo en las tablas necesarias
-GRANT SELECT, INSERT, UPDATE ON
+-- Asignar permisos completos sobre las tablas que manipulará el backend
+GRANT SELECT, INSERT, UPDATE, DELETE ON 
     participante,
     personal,
     curso,
     clase,
+    inscripcion,
+    avance_autonomo,
     asistencia,
-    calificacion,
-    participante_curso
+    calificacion
 TO app_user;
 
--- Permitir lectura de catálogos
-GRANT SELECT ON
+-- Permitir SELECT en tablas de catálogo (solo lectura)
+GRANT SELECT ON 
     catalogo_rol,
     catalogo_departamento,
     catalogo_modalidad
 TO app_user;
 
--- Otorgar acceso a vistas (solo SELECT)
-GRANT SELECT ON
-    vista_notas_participante,
-    vista_asistencia_participante,
-    vista_control_tutor,
-    vista_info_administrador
-TO app_user;
+-- Otorgar permisos SELECT sobre las vistas
+GRANT SELECT ON 
+    vista_participante_detalle,
+    vista_personal_detalle,
+    vista_control_general,
+    vista_tutor_calificaciones,
+    vista_tutor_asistencias,
+    vista_tutor_clases,
+	vista_participante_asistencias,
+	vista_participante_inscripciones
+	TO app_user;
 
-GRANT DELETE ON
-    participante,
-    personal,
-    curso,
-    clase,
-    asistencia,
-    calificacion,
-    participante_curso
-TO app_user;
-
--- Permitir uso de secuencias (si las hay para campos seriales, aunque usas ID explícitos)
-GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO app_user;
-
--- Evita que otros roles creen objetos en el esquema por defecto
-REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+-- Otorgar permisos de ejecución sobre funciones necesarias
+GRANT EXECUTE ON FUNCTION es_sincronico(INT, INT) TO app_user;

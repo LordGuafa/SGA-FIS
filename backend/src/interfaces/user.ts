@@ -4,5 +4,6 @@ export interface IUser {
   email: string;
   password: string;
   contactNumber1: string;
-  contactNumber2?: string; // Optional contact number    role: 1|2|3;
+  contactNumber2?: string;
+  role_id: 1 | 2 | 3;
 }

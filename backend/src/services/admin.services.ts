@@ -9,16 +9,17 @@ import dotenv from "dotenv";
 import { config } from "../config/config";
 
 export class AdminServices implements IUserServices {
-  async login(email: string, password: string): Promise<string | null> {
+  async login(email: string, contrasena: string): Promise<string | null> {
     const res = await pool.query(
-      "SELECT * FROM personal WHERE correo = $1 and role_id = 1",
+      "SELECT * FROM personal WHERE correo = $1 and rol_id = 1",
       [email]
     );
     const user: Admin = res.rows[0];
     if (!user) {
       return null;
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(contrasena, user.password);
+    console.log(isPasswordValid)
     if (!isPasswordValid) {
       return null;
     }
@@ -29,7 +30,7 @@ export class AdminServices implements IUserServices {
         contact1: user.contactNumber1,
         contact2: user.contactNumber2,
         email: user.email,
-        role: user.role,
+        rol_id: user.rol_id,
       },
       config.JWT_SECRET,
       { expiresIn: "1h" }
@@ -79,7 +80,7 @@ export class AdminServices implements IUserServices {
         participante.contactNumber1,
         participante.contactNumber2,
         participante.departmentId,
-        participante.role,
+        participante.rol_id,
       ]
     );
     return res.rows[0];
@@ -98,7 +99,7 @@ export class AdminServices implements IUserServices {
         hashedPassword,
         newTutor.contactNumber1,
         newTutor.contactNumber2,
-        newTutor.role,
+        newTutor.rol_id,
       ]
     );
     return res.rows[0];
@@ -178,3 +179,4 @@ export class AdminServices implements IUserServices {
     const res = await pool.query("DELETE FROM personal WHERE id = $1", [id]);
   }
 }
+

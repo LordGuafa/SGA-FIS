@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 declare global {
     namespace Express {
         interface Request {
-            auth?: { role?: number };
+            auth?: { rol_id?: number };
         }
     }
 }
@@ -11,9 +11,9 @@ declare global {
 export function checkRole(...roles: string[]) {
     return (req: Request, res: Response, next: NextFunction) => {
 
-        const user = req.auth as { role?: string };
+        const user = req.auth as { rol_id?: string };
 
-        if (!user || !user.role || !roles.includes(user.role)) {
+        if (!user || !user.rol_id || !roles.includes(user.rol_id)) {
             return res.status(403).json({ message: "Acceso denegado"})
         }
         next();

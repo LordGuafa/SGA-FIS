@@ -7,7 +7,7 @@ export class Tutor implements IUser {
   password: string;
   contactNumber1: string;
   contactNumber2?: string | undefined;
-  role: 1 | 2 | 3 = 2;
+  rol_id: 1 | 2 | 3 = 2;
   constructor(
     id: number,
     username: string,
