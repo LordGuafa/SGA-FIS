@@ -11,7 +11,7 @@ export class AdminController {
     res.status(200).json({ token });
   }
   getParticipantes = async (_: Request, res: Response) => {
-    const participantes = await this.services.getParticipantes();
+    const participantes = await this.services.listParticipantes();
     res.status(200).json(participantes);
   };
 
@@ -24,7 +24,7 @@ export class AdminController {
   };
 
   getPersonal = async (_: Request, res: Response) => {
-    const personal = await this.services.getPersonal();
+    const personal = await this.services.listTutores();
     res.status(200).json(personal);
   };
 

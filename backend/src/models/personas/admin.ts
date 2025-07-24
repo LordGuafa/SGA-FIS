@@ -1,4 +1,4 @@
-import { IUser } from "../../interfaces/user";
+import { IUser } from "../../interfaces/IUser";
 
 export class Admin implements IUser {
   id: number;
@@ -24,4 +24,5 @@ export class Admin implements IUser {
     this.contactNumber1 = contactNumber1;
     this.contactNumber2 = contactNumber2;
   }
+ 
 }

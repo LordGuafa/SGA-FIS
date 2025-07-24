@@ -5,5 +5,5 @@ export interface IUser {
   password: string;
   contactNumber1: string;
   contactNumber2?: string;
-  role_id: 1 | 2 | 3;
+  rol_id: 1 | 2 | 3;
 }

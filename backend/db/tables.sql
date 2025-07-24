@@ -1,3 +1,4 @@
+-- Tabla de roles del sistema (administrativo, tutor, participante)
 CREATE TABLE IF NOT EXISTS catalogo_rol (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(50) UNIQUE NOT NULL CHECK (
@@ -9,6 +10,7 @@ CREATE TABLE IF NOT EXISTS catalogo_rol (
     )
 );
 
+-- Tabla de departamentos OCAD
 CREATE TABLE IF NOT EXISTS catalogo_departamento (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) UNIQUE NOT NULL,
@@ -16,6 +18,7 @@ CREATE TABLE IF NOT EXISTS catalogo_departamento (
     region_ocad VARCHAR(100) NOT NULL
 );
 
+-- Tabla de modalidades de inscripción (sincrónica/autónoma)
 CREATE TABLE IF NOT EXISTS catalogo_modalidad (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(20) UNIQUE NOT NULL CHECK (
@@ -23,6 +26,7 @@ CREATE TABLE IF NOT EXISTS catalogo_modalidad (
     )
 );
 
+-- Tabla de personal (usuarios administrativos y tutores)
 CREATE TABLE IF NOT EXISTS personal (
     id INTEGER PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -33,6 +37,7 @@ CREATE TABLE IF NOT EXISTS personal (
     rol_id INTEGER NOT NULL REFERENCES catalogo_rol (id) ON DELETE RESTRICT
 );
 
+-- Tabla de participantes (usuarios que toman cursos)
 CREATE TABLE IF NOT EXISTS participante (
     id INTEGER PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -40,16 +45,18 @@ CREATE TABLE IF NOT EXISTS participante (
     password TEXT NOT NULL,
     contact1 VARCHAR(20),
     contact2 VARCHAR(20),
-    departmentId INTEGER NOT NULL REFERENCES catalogo_departamento (id) ON DELETE RESTRICT,
+    departamento_id INTEGER NOT NULL REFERENCES catalogo_departamento (id) ON DELETE RESTRICT,
     rol_id INTEGER NOT NULL REFERENCES catalogo_rol (id) ON DELETE RESTRICT
 );
 
+-- Tabla de cursos disponibles
 CREATE TABLE IF NOT EXISTS curso (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT
 );
 
+-- Tabla de clases asociadas a cursos y tutores
 CREATE TABLE IF NOT EXISTS clase (
     id SERIAL PRIMARY KEY,
     curso_id INTEGER NOT NULL REFERENCES curso (id) ON DELETE CASCADE,
@@ -58,6 +65,7 @@ CREATE TABLE IF NOT EXISTS clase (
     tema TEXT
 );
 
+-- Tabla de inscripciones de participantes a cursos y modalidad
 CREATE TABLE IF NOT EXISTS inscripcion (
     id SERIAL PRIMARY KEY,
     curso_id INTEGER NOT NULL REFERENCES curso (id) ON DELETE CASCADE,
@@ -67,6 +75,7 @@ CREATE TABLE IF NOT EXISTS inscripcion (
     UNIQUE (curso_id, participante_id)
 );
 
+-- Tabla de avances autónomos de participantes en cursos
 CREATE TABLE IF NOT EXISTS avance_autonomo (
     id SERIAL PRIMARY KEY,
     inscripcion_id INTEGER NOT NULL REFERENCES inscripcion (id) ON DELETE CASCADE,
@@ -74,6 +83,7 @@ CREATE TABLE IF NOT EXISTS avance_autonomo (
     fecha DATE DEFAULT CURRENT_DATE
 );
 
+-- Tabla de asistencias de participantes a clases
 CREATE TABLE IF NOT EXISTS asistencia (
     id SERIAL PRIMARY KEY,
     clase_id INTEGER NOT NULL REFERENCES clase (id) ON DELETE CASCADE,
@@ -82,6 +92,7 @@ CREATE TABLE IF NOT EXISTS asistencia (
     UNIQUE (clase_id, participante_id)
 );
 
+-- Tabla de calificaciones de participantes en clases
 CREATE TABLE IF NOT EXISTS calificacion (
     id SERIAL PRIMARY KEY,
     clase_id INTEGER NOT NULL REFERENCES clase (id) ON DELETE CASCADE,
@@ -91,6 +102,7 @@ CREATE TABLE IF NOT EXISTS calificacion (
     UNIQUE (clase_id, participante_id)
 );
 
+-- Función para verificar si la inscripción de un participante a un curso es sincrónica
 CREATE OR REPLACE FUNCTION es_sincronico(p_participante_id INT, p_curso_id INT)
 RETURNS BOOLEAN AS $$
 DECLARE

@@ -9,17 +9,17 @@ import dotenv from "dotenv";
 import { config } from "../config/config";
 
 export class AdminServices implements IUserServices {
-  async login(email: string, contrasena: string): Promise<string | null> {
+  async login(email: string, password: string): Promise<string | null> {
     const res = await pool.query(
-      "SELECT * FROM personal WHERE correo = $1 and rol_id = 1",
+      "SELECT * FROM personal WHERE email = $1 and rol_id = 1",
       [email]
     );
     const user: Admin = res.rows[0];
     if (!user) {
       return null;
     }
-    const isPasswordValid = await bcrypt.compare(contrasena, user.password);
-    console.log(isPasswordValid)
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log(isPasswordValid);
     if (!isPasswordValid) {
       return null;
     }
@@ -44,7 +44,7 @@ export class AdminServices implements IUserServices {
     newPassword: string
   ): Promise<Boolean> {
     const query = await pool.query(
-      "SELECT * FROM personal WHERE id = $1 AND role_id = 1",
+      "SELECT * FROM personal WHERE id = $1 AND rol_id = 1",
       [id]
     );
     const user: Admin = query.rows[0];
@@ -72,14 +72,15 @@ export class AdminServices implements IUserServices {
       config.SALT_ROUNDS
     );
     const res = await pool.query(
-      "INSERT INTO participante (nombre, correo, password, contacto_1, contacto_2, departamento_id, rol_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+      "INSERT INTO participante (id,nombre, email, password, contact1, contact2, departamento_id, rol_id) VALUES ($1, $2, $3, $4, $5, $6, $7,$8)",
       [
+        participante.id,
         participante.username,
         participante.email,
         hashedPassword,
         participante.contactNumber1,
         participante.contactNumber2,
-        participante.departmentId,
+        participante.departamento_id,
         participante.rol_id,
       ]
     );
@@ -92,8 +93,9 @@ export class AdminServices implements IUserServices {
       config.SALT_ROUNDS
     );
     const res = await pool.query(
-      "INSERT INTO participante (nombre, correo, password, contacto_1, contacto_2, departamento_id, rol_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+      "INSERT INTO participante (id,nombre, email, password, contact1, contact2, departamento_id, rol_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
       [
+        newTutor.id,
         newTutor.username,
         newTutor.email,
         hashedPassword,
@@ -149,13 +151,13 @@ export class AdminServices implements IUserServices {
     return res.rows[0] || null;
   }
 
-  async getParticipantes(): Promise<Participante[]> {
+  async listParticipantes(): Promise<Participante[]> {
     const res = await pool.query("SELECT * FROM participante");
     return res.rows;
   }
 
-  async getPersonal(): Promise<Tutor[]> {
-    const res = await pool.query("SELECT * FROM personal WHERE role_id = 2");
+  async listTutores(): Promise<Tutor[]> {
+    const res = await pool.query("SELECT * FROM personal WHERE rol_id = 2");
     return res.rows;
   }
 
@@ -166,17 +168,124 @@ export class AdminServices implements IUserServices {
     return res.rows[0] || null;
   }
 
-  async getTutorById(id: number): Promise<Tutor | null>{
-    const res = await pool.query("SELECT * FROM personal WHERE id = $1 AND role_id = 2", [id]);
+  async getTutorById(id: number): Promise<Tutor | null> {
+    const res = await pool.query(
+      "SELECT * FROM personal WHERE id = $1 AND rol_id = 2",
+      [id]
+    );
     return res.rows[0] || null;
   }
 
   async deleteParticipante(id: number): Promise<void> {
-    const res = await pool.query("DELETE FROM participante WHERE id = $1", [id]);
+    const res = await pool.query("DELETE FROM participante WHERE id = $1", [
+      id,
+    ]);
   }
 
   async deletePersonal(id: number): Promise<void> {
     const res = await pool.query("DELETE FROM personal WHERE id = $1", [id]);
   }
-}
+  async createCurso(curso: any) {
+    const result = await pool.query(
+      `INSERT INTO cursos (nombre, descripcion) VALUES ($1, $2) RETURNING *`,
+      [curso.nombre, curso.descripcion]
+    );
+    return result.rows[0];
+  }
 
+  async updateCurso(id: number, curso: any) {
+    await pool.query(
+      `UPDATE cursos SET nombre = $1, descripcion = $2 WHERE id = $3`,
+      [curso.nombre, curso.descripcion, id]
+    );
+  }
+
+  async deleteCurso(id: number) {
+    await pool.query(`DELETE FROM cursos WHERE id = $1`, [id]);
+  }
+
+  async listCursos() {
+    const result = await pool.query(`SELECT * FROM cursos`);
+    return result.rows;
+  }
+
+  // Métodos para inscripciones
+  async createInscripcion(participante_id: number, curso_id: number) {
+    const result = await pool.query(
+      `INSERT INTO inscripciones (participante_id, curso_id) VALUES ($1, $2) RETURNING *`,
+      [participante_id, curso_id]
+    );
+    return result.rows[0];
+  }
+
+  async updateInscripcion(
+    id: number,
+    participante_id: number,
+    curso_id: number
+  ) {
+    await pool.query(
+      `UPDATE inscripciones SET participante_id = $1, curso_id = $2 WHERE id = $3`,
+      [participante_id, curso_id, id]
+    );
+  }
+
+  async deleteInscripcion(id: number) {
+    await pool.query(`DELETE FROM inscripciones WHERE id = $1`, [id]);
+  }
+
+  async listInscripciones() {
+    const result = await pool.query(`SELECT * FROM inscripciones`);
+    return result.rows;
+  }
+
+  // Métodos para notas y asistencias
+  async createNota(participante_id: number, curso_id: number, nota: number) {
+    const result = await pool.query(
+      `INSERT INTO notas (participante_id, curso_id, nota) VALUES ($1, $2, $3) RETURNING *`,
+      [participante_id, curso_id, nota]
+    );
+    return result.rows[0];
+  }
+
+  async updateNota(id: number, nota: number) {
+    await pool.query(`UPDATE notas SET nota = $1 WHERE id = $2`, [nota, id]);
+  }
+
+  async deleteNota(id: number) {
+    await pool.query(`DELETE FROM notas WHERE id = $1`, [id]);
+  }
+
+  async listNotas() {
+    const result = await pool.query(`SELECT * FROM notas`);
+    return result.rows;
+  }
+
+  async createAsistencia(
+    participante_id: number,
+    curso_id: number,
+    fecha: string,
+    estado: string
+  ) {
+    const result = await pool.query(
+      `INSERT INTO asistencias (participante_id, curso_id, fecha, estado) VALUES ($1, $2, $3, $4) RETURNING *`,
+      [participante_id, curso_id, fecha, estado]
+    );
+    return result.rows[0];
+  }
+
+  async updateAsistencia(id: number, estado: string) {
+    await pool.query(`UPDATE asistencias SET estado = $1 WHERE id = $2`, [
+      estado,
+      id,
+    ]);
+  }
+
+  async deleteAsistencia(id: number) {
+    await pool.query(`DELETE FROM asistencias WHERE id = $1`, [id]);
+  }
+
+  async listAsistencias() {
+    const result = await pool.query(`SELECT * FROM asistencias`);
+    return result.rows;
+  }
+}

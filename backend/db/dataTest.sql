@@ -38,10 +38,10 @@ INSERT INTO
     personal (
         id,
         nombre,
-        correo,
-        contrasena,
-        telefono1,
-        telefono2,
+        email,
+        password,
+        contact1,
+        contact2,
         rol_id
     )
 VALUES (
@@ -68,10 +68,10 @@ INSERT INTO
     participante (
         id,
         nombre,
-        correo,
-        contrasena,
-        telefono1,
-        telefono2,
+        email,
+        password,
+        contact1,
+        contact2,
         departamento_id,
         rol_id
     )

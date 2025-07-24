@@ -14,33 +14,33 @@ adminRouter.post("/login", adminController.login);
 adminRouter.use(authMiddleware);
 
 // Participantes
-adminRouter.get("/participantes", checkRole("1"), adminController.getParticipantes);
+adminRouter.get("/participantes", checkRole(1), adminController.getParticipantes);
 adminRouter.get(
   "/participantes/:id",
-  checkRole("1"),
+  checkRole(1),
   adminController.getParticipantesById
 );
 adminRouter.post(
   "/participantes",
-  checkRole("1"),
+  checkRole(1),
   adminController.createParticipante
 );
 adminRouter.put(
   "/participantes/:id",
-  checkRole("1"),
+  checkRole(1),
   adminController.updateParticipante
 );
 adminRouter.delete(
   "/participantes/:id",
-  checkRole("1"),
+  checkRole(1),
   adminController.deleteParticipante
 );
 
 // Personal
-adminRouter.get("/personal", checkRole("1"), adminController.getPersonal);
-adminRouter.get("/personal/:id", checkRole("1"), adminController.getPersonalBtId);
-adminRouter.post("/personal", checkRole("1"), adminController.createPersonal);
-adminRouter.put("/personal/:id", checkRole("1"), adminController.updatePersonal);
-adminRouter.delete("/personal/:id", checkRole("1"), adminController.deletePersonal);
+adminRouter.get("/personal", checkRole(1), adminController.getPersonal);
+adminRouter.get("/personal/:id", checkRole(1), adminController.getPersonalBtId);
+adminRouter.post("/personal", checkRole(1), adminController.createPersonal);
+adminRouter.put("/personal/:id", checkRole(1), adminController.updatePersonal);
+adminRouter.delete("/personal/:id", checkRole(1), adminController.deletePersonal);
 
 export default adminRouter;

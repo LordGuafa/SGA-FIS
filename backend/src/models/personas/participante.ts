@@ -1,4 +1,4 @@
-import { IUser } from "../../interfaces/user";
+import { IUser } from "../../interfaces/IUser";
 export class Participante implements IUser {
   id: number;
   username: string;
@@ -6,7 +6,7 @@ export class Participante implements IUser {
   password: string;
   contactNumber1: string;
   contactNumber2?: string;
-  departmentId: number;
+  departamento_id: number;
   rol_id: 1 | 2 | 3 = 3;
 
   constructor(
@@ -24,6 +24,6 @@ export class Participante implements IUser {
     this.password = password;
     this.contactNumber1 = contactNumber1;
     this.contactNumber2 = contactNumber2;
-    this.departmentId = department;
+    this.departamento_id = department;
   }
 }

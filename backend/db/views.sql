@@ -1,8 +1,9 @@
+-- Vista de inscripciones de participantes a cursos
 CREATE OR REPLACE VIEW vista_participante_inscripciones AS
 SELECT
     p.id AS participante_id,
     p.nombre AS participante_nombre,
-    p.correo,
+    p.email,
     cd.nombre AS departamento,
     c.id AS curso_id,
     c.nombre AS curso_nombre,
@@ -15,6 +16,7 @@ FROM
     JOIN curso c ON c.id = i.curso_id
     JOIN catalogo_modalidad cm ON cm.id = i.modalidad_id;
 
+-- Vista de asistencias de participantes a clases
 CREATE OR REPLACE VIEW vista_participante_asistencias AS
 SELECT
     a.participante_id,
@@ -28,6 +30,7 @@ FROM
     JOIN clase cl ON cl.id = a.clase_id
     JOIN curso c ON c.id = cl.curso_id;
 
+-- Vista de calificaciones de participantes en clases
 CREATE OR REPLACE VIEW vista_participante_calificaciones AS
 SELECT cal.participante_id, cl.id AS clase_id, cl.tema, cl.fecha, c.nombre AS curso, cal.nota, cal.observaciones
 FROM
@@ -35,6 +38,7 @@ FROM
     JOIN clase cl ON cl.id = cal.clase_id
     JOIN curso c ON c.id = cl.curso_id;
 
+-- Vista de clases dictadas por tutores
 CREATE OR REPLACE VIEW vista_tutor_clases AS
 SELECT
     cl.id AS clase_id,
@@ -49,6 +53,7 @@ FROM
     JOIN curso c ON c.id = cl.curso_id
     JOIN personal t ON t.id = cl.tutor_id;
 
+-- Vista de asistencias por clase y tutor
 CREATE OR REPLACE VIEW vista_tutor_asistencias AS
 SELECT
     t.id AS tutor_id,
@@ -64,6 +69,7 @@ FROM
     JOIN asistencia a ON a.clase_id = cl.id
     JOIN participante p ON p.id = a.participante_id;
 
+-- Vista de calificaciones por clase y tutor
 CREATE OR REPLACE VIEW vista_tutor_calificaciones AS
 SELECT
     t.id AS tutor_id,
@@ -80,6 +86,7 @@ FROM
     JOIN calificacion cal ON cal.clase_id = cl.id
     JOIN participante p ON p.id = cal.participante_id;
 
+-- Vista de control general de participantes, cursos, clases, asistencias y calificaciones
 CREATE OR REPLACE VIEW vista_control_general AS
 SELECT
     p.id AS participante_id,
@@ -103,13 +110,15 @@ FROM
     LEFT JOIN calificacion cal ON cal.participante_id = p.id
     AND cal.clase_id = cl.id;
 
+-- Vista de detalle de personal (administrativos y tutores)
 CREATE OR REPLACE VIEW vista_personal_detalle AS
-SELECT per.id, per.nombre, per.correo, cr.nombre AS rol
+SELECT per.id, per.nombre, per.email, cr.nombre AS rol
 FROM personal per
     JOIN catalogo_rol cr ON cr.id = per.rol_id;
 
+-- Vista de detalle de participantes
 CREATE OR REPLACE VIEW vista_participante_detalle AS
-SELECT p.id, p.nombre, p.correo, cd.nombre AS departamento, cr.nombre AS rol
+SELECT p.id, p.nombre, p.email, cd.nombre AS departamento, cr.nombre AS rol
 FROM
     participante p
     JOIN catalogo_departamento cd ON cd.id = p.departamento_id
