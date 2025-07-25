@@ -41,7 +41,7 @@ export class AdminController {
   };
 
   createPersonal = async (req: Request, res: Response) => {
-    const newPersonal = await this.services.createParticipante(req.body);
+    const newPersonal = await this.services.createTutor(req.body);
     res.status(201).json(newPersonal);
   };
 

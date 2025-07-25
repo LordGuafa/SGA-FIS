@@ -61,6 +61,16 @@ VALUES (
         '3003333333',
         NULL,
         2
+    )
+    ,
+    (
+        00000,
+        'Tutor por asignar',
+        'por asignar',
+        '',--admin123
+        NULL,
+        NULL,
+        2
     );
 
 -- Participantes

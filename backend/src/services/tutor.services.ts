@@ -41,7 +41,6 @@ export class TutorServices implements IUserServices {
     return true;
   }
 
-
   async registrarAsistencia(claseId: number, asistencias: { participanteId: number, presente: boolean }[]): Promise<void> {
     for (const asistencia of asistencias) {
       await pool.query(
