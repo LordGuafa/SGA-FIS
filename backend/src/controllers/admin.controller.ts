@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { AdminServices } from "../services/admin.services";
 
+//TODO: Verificar la gestión de notas, asistencias e inscripciones
 export class AdminController {
   private services = new AdminServices();
 

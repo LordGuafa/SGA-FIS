@@ -209,6 +209,20 @@ export class AdminServices implements IUserServices {
     return result.rows;
   }
 
+  async assignTutor(tutor_id: number, curso_id: number) {
+    const result = await pool.query(
+      `INSERT INTO tutores_cursos (tutor_id, curso_id) VALUES ($1, $2) RETURNING *`,
+      [tutor_id, curso_id]
+    );
+    return result.rows[0];
+  }
+
+  async reassignTutor(oldTutorId: number, newTutorId: number, cursoId: number) {
+    await pool.query(
+      `UPDATE tutores_cursos SET tutor_id = $1 WHERE tutor_id = $2 AND curso_id = $3`,
+      [newTutorId, oldTutorId, cursoId]
+    );
+  }
   // Métodos para inscripciones
   async createInscripcion(participante_id: number, curso_id: number) {
     const result = await pool.query(

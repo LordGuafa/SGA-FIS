@@ -48,7 +48,7 @@ VALUES (
         101,
         'Ana Administrativa',
         'ana.admin@sga.com',
-        '$2b$10$fT9pk4.6KGSUoxTUWNn39uZlqMpZEgi6uj64ETL7.XqNAO6dZrW6G',
+        '$2b$10$fT9pk4.6KGSUoxTUWNn39uZlqMpZEgi6uj64ETL7.XqNAO6dZrW6G',--admin123
         '3001111111',
         '3002222222',
         1
@@ -57,7 +57,7 @@ VALUES (
         102,
         'Carlos Tutor',
         'carlos.tutor@sga.com',
-        'tutor123',
+        '$2b$10$fT9pk4.6KGSUoxTUWNn39uZlqMpZEgi6uj64ETL7.XqNAO6dZrW6G',--admin123
         '3003333333',
         NULL,
         2
@@ -79,7 +79,7 @@ VALUES (
         201,
         'Luis Participante',
         'luis.part@sga.com',
-        'part123',
+        '$2b$10$fT9pk4.6KGSUoxTUWNn39uZlqMpZEgi6uj64ETL7.XqNAO6dZrW6G',--admin123
         '3011111111',
         NULL,
         1,
@@ -89,7 +89,7 @@ VALUES (
         202,
         'Maria Participante',
         'maria.part@sga.com',
-        'part456',
+        '$2b$10$fT9pk4.6KGSUoxTUWNn39uZlqMpZEgi6uj64ETL7.XqNAO6dZrW6G',--admin123
         '3012222222',
         '3013333333',
         2,

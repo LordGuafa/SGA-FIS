@@ -41,13 +41,6 @@ export class TutorServices implements IUserServices {
     return true;
   }
 
-  async createClase(tutorId: number, cursoId: number, fecha: Date, tema?: string): Promise<any> {
-    const res = await pool.query(
-      "INSERT INTO clase (curso_id, tutor_id, fecha, tema) VALUES ($1, $2, $3, $4) RETURNING *",
-      [cursoId, tutorId, fecha, tema]
-    );
-    return res.rows[0];
-  }
 
   async registrarAsistencia(claseId: number, asistencias: { participanteId: number, presente: boolean }[]): Promise<void> {
     for (const asistencia of asistencias) {
@@ -65,5 +58,29 @@ export class TutorServices implements IUserServices {
         [claseId, nota.participanteId, nota.nota, nota.observaciones || null]
       );
     }
+  }
+
+  async getClasesAsignadas(tutorId: number) {
+    const res = await pool.query(
+      "SELECT * FROM vista_tutor_clases WHERE tutor_id = $1",
+      [tutorId]
+    );
+    return res.rows;
+  }
+
+  async getAsistencias(tutorId: number) {
+    const res = await pool.query(
+      "SELECT * FROM vista_tutor_asistencias WHERE tutor_id = $1",
+      [tutorId]
+    );
+    return res.rows;
+  }
+
+  async getCalificaciones(tutorId: number) {
+    const res = await pool.query(
+      "SELECT * FROM vista_tutor_calificaciones WHERE tutor_id = $1",
+      [tutorId]
+    );
+    return res.rows;
   }
 }

@@ -13,6 +13,7 @@ function getEnvVar(name: string): string {
 export const config = {
   PORT: parseInt(getEnvVar("PORT")),
   JWT_SECRET: getEnvVar("JWT_SECRET"),
+  JWT_EXPIRATION:String(getEnvVar("JWT_EXPIRATION")),
   DB_HOST: getEnvVar("DB_HOST"),
   DB_PORT: parseInt(getEnvVar("DB_PORT")),
   DB_USER: getEnvVar("DB_USER"),
