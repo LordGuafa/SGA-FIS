@@ -177,6 +177,7 @@ export class AdminServices implements IUserServices {
   }
 
   async deleteParticipante(id: number): Promise<void> {
+    //TODO: Verificar si el participante tiene inscripciones o asistencias antes de eliminar
     const res = await pool.query("DELETE FROM participante WHERE id = $1", [
       id,
     ]);
