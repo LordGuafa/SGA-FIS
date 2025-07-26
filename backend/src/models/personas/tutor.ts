@@ -8,6 +8,7 @@ export class Tutor implements IUser {
   contactNumber1: string;
   contactNumber2?: string | undefined;
   rol_id: 1 | 2 | 3 = 2;
+  activo: boolean = true;
   constructor(
     id: number,
     username: string,

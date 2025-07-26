@@ -72,7 +72,7 @@ export class AdminServices implements IUserServices {
       config.SALT_ROUNDS
     );
     const res = await pool.query(
-      "INSERT INTO participante (id,nombre, email, password, contact1, contact2, departamento_id, rol_id) VALUES ($1, $2, $3, $4, $5, $6, $7,$8)",
+      "INSERT INTO participante (id,nombre, email, password, contact1, contact2, departamento_id, rol_id) VALUES ($1, $2, $3, $4, $5, $6, $7,$8,)",
       [
         participante.id,
         participante.username,
@@ -82,7 +82,7 @@ export class AdminServices implements IUserServices {
         participante.contactNumber2,
         participante.departamento_id,
         participante.rol_id,
-      ]
+      ]//Por defecto el estado de activo es true
     );
     return res.rows[0];
   }
