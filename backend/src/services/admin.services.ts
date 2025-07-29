@@ -72,7 +72,7 @@ export class AdminServices implements IUserServices {
       config.SALT_ROUNDS
     );
     const res = await pool.query(
-      "INSERT INTO participante (id,nombre, email, password, contact1, contact2, departamento_id, rol_id) VALUES ($1, $2, $3, $4, $5, $6, $7,$8)",
+      "INSERT INTO participante (id,nombre, email, password, contact1, contact2, departamento_id, rol_id) VALUES ($1, $2, $3, $4, $5, $6, $7,$8,)",
       [
         participante.id,
         participante.username,
@@ -82,7 +82,7 @@ export class AdminServices implements IUserServices {
         participante.contactNumber2,
         participante.departamento_id,
         participante.rol_id,
-      ]
+      ]//Por defecto el estado de activo es true
     );
     return res.rows[0];
   }
@@ -93,7 +93,7 @@ export class AdminServices implements IUserServices {
       config.SALT_ROUNDS
     );
     const res = await pool.query(
-      "INSERT INTO participante (id,nombre, email, password, contact1, contact2, departamento_id, rol_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+      "INSERT INTO personal (id,nombre, email, password, contact1, contact2, rol_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
       [
         newTutor.id,
         newTutor.username,
@@ -177,14 +177,34 @@ export class AdminServices implements IUserServices {
   }
 
   async deleteParticipante(id: number): Promise<void> {
+    //TODO: Verificar si el participante tiene inscripciones o asistencias antes de eliminar
     const res = await pool.query("DELETE FROM participante WHERE id = $1", [
       id,
     ]);
   }
 
-  async deletePersonal(id: number): Promise<void> {
-    const res = await pool.query("DELETE FROM personal WHERE id = $1", [id]);
+async deletePersonal(id: number): Promise<void> {
+  try {
+    await pool.query("DELETE FROM personal WHERE id = $1", [id]);
+  } catch (error: any) {
+    // Verifica si el error es por restricción de llave foránea (código puede variar según tu motor de BD)
+    if (
+      error.code === "23503" // Código típico de Postgres para violación de llave foránea
+    ) {
+      // Reasigna todas las referencias en tutores_cursos al tutor con id 0
+      await pool.query(
+        "UPDATE clase SET tutor_id = 0 WHERE tutor_id = $1",
+        [id]
+      );
+      // Puedes agregar aquí más actualizaciones si hay otras tablas que referencian a personal.id
+
+      // Intenta eliminar de nuevo
+      await pool.query("DELETE FROM personal WHERE id = $1", [id]);
+    } else {
+      throw error;
+    }
   }
+}
   async createCurso(curso: any) {
     const result = await pool.query(
       `INSERT INTO cursos (nombre, descripcion) VALUES ($1, $2) RETURNING *`,

@@ -12,7 +12,7 @@ GRANT CONNECT ON DATABASE sga TO app_user;
 GRANT USAGE ON SCHEMA public TO app_user;
 
 -- Asignar permisos completos sobre las tablas que manipulará el backend
-GRANT SELECT, INSERT, UPDATE, DELETE ON 
+GRANT SELECT, INSERT, UPDATE, DELETE ON
     participante,
     personal,
     curso,
@@ -24,14 +24,14 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON
 TO app_user;
 
 -- Permitir SELECT en tablas de catálogo (solo lectura)
-GRANT SELECT ON 
+GRANT SELECT ON
     catalogo_rol,
     catalogo_departamento,
     catalogo_modalidad
 TO app_user;
 
 -- Otorgar permisos SELECT sobre las vistas
-GRANT SELECT ON 
+GRANT SELECT ON
     vista_participante_detalle,
     vista_personal_detalle,
     vista_control_general,
