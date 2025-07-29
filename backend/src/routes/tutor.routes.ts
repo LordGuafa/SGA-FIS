@@ -10,6 +10,12 @@ tutorRouter.post("/login", tutorController.login);
 
 tutorRouter.use(authMiddleware, checkRole(2));
 
+tutorRouter.put(
+  "/change-password/:id",
+  checkRole(2),
+  tutorController.changePassword
+);
+
 tutorRouter.post(
   "/asistencias",
   checkRole(2),

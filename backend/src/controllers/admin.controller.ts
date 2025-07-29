@@ -11,6 +11,13 @@ export class AdminController {
     if (!token) return res.status(401).json({ message: 'Invalid credentials' });
     res.status(200).json({ token });
   }
+  changePassword = async (req: Request, res: Response) => {
+    const { oldPassword, newPassword } = req.body;
+    const userId = Number(req.params.id);
+    const success = await this.services.changePassword(userId, oldPassword, newPassword);
+    if (!success) return res.status(400).json({ message: 'Failed to change password' });
+    res.status(200).json({ message: 'Password changed successfully' });
+  };
   getParticipantes = async (_: Request, res: Response) => {
     const participantes = await this.services.listParticipantes();
     res.status(200).json(participantes);

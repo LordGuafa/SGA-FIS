@@ -14,6 +14,15 @@ export class TutorController {
     res.json({ token });
   }
 
+  async changePassword(req: Request, res: Response) {
+    const { oldPassword, newPassword } = req.body;
+    const userId = Number(req.params.id);
+    const success = await tutorServices.changePassword(userId, oldPassword, newPassword);
+    if (!success) {
+      return res.status(400).json({ message: "Failed to change password" });
+    }
+    res.status(200).json({ message: "Password changed successfully" });
+  }
   async registrarAsistencia(req: Request, res: Response) {
     const response = req.body;
     // const claseId = response.clase_id;

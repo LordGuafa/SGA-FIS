@@ -13,6 +13,12 @@ adminRouter.post("/login", adminController.login);
 
 adminRouter.use(authMiddleware);
 
+//Cambio de contraseña
+adminRouter.put(
+  "/change-password/:id",
+  checkRole(1),
+  adminController.changePassword
+);
 // Participantes
 adminRouter.get("/participantes", checkRole(1), adminController.getParticipantes);
 adminRouter.get(
