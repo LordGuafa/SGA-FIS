@@ -3,7 +3,7 @@ import cors from 'cors';
 import { config } from './config/config';
 import adminRouter from './routes/admin.routes';
 import tutorRouter from './routes/tutor.routes';
-import calificacionRouter from './routes/calificacion.routes';
+import calificacionRouter from './routes/participante.routes';
 
 const app = express();
 app.use(cors());
