@@ -1,6 +1,6 @@
 export interface INote {
-  id: number;
+  clase_id: number;
   participante_id: number;
-  course_id: number;
-  valor: number; // Nota del 0 al 5
+  nota: number;
+  observaciones?: string;
 }

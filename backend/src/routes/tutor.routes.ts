@@ -21,14 +21,14 @@ tutorRouter.post(
   checkRole(2),
   tutorController.registrarAsistencia
 );
-tutorRouter.post("/notas", checkRole(2), tutorController.registrarNota);
+tutorRouter.post("/:id/:clase_id/notas", checkRole(2), tutorController.registrarNota);
 
-tutorRouter.get("/clases", checkRole(2), tutorController.getClasesAsignadas);
+tutorRouter.get("/:id/clases", checkRole(2), tutorController.getClasesAsignadas);
 
-tutorRouter.get("/asistencias", checkRole(2), tutorController.getAsistencias);
+tutorRouter.get("/:id/asistencias", checkRole(2), tutorController.getAsistencias);
 
 tutorRouter.get(
-  "/calificaciones",
+  "/:id/calificaciones",
   checkRole(2),
   tutorController.getCalificaciones
 );

@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS personal (
 
 -- Tabla de participantes (usuarios que toman cursos)
 CREATE TABLE IF NOT EXISTS participante (
-    id INTEGER PRIMARY KEY ON DELETE CASCADE,
+    id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password TEXT NOT NULL,
@@ -47,8 +47,9 @@ CREATE TABLE IF NOT EXISTS participante (
     contact2 VARCHAR(20),
     departamento_id INTEGER NOT NULL REFERENCES catalogo_departamento (id) ON DELETE RESTRICT,
     rol_id INTEGER NOT NULL REFERENCES catalogo_rol (id) ON DELETE RESTRICT,
-    activo BOOLEAN DEFAULT TRUE,
+    activo BOOLEAN DEFAULT TRUE
 );
+
 
 -- Tabla de cursos disponibles
 CREATE TABLE IF NOT EXISTS curso (

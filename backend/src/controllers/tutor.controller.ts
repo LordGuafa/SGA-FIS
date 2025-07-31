@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { TutorServices } from "../services/tutor.services";
-
+import { INote } from "../interfaces/INotes";
 const tutorServices = new TutorServices();
 
 //TODO:Corregir los cómo se envía la información a los servicios
@@ -33,21 +33,24 @@ export class TutorController {
   }
 
   async registrarNota(req: Request, res: Response) {
-    const { claseId, notas } = req.body;
-    await tutorServices.registrarNota(claseId, notas);
+    const nota = req.body;
+    const response= req.params;
+    const claseId = Number(req.params.clase_id);
+    console.log("Notas:", nota);
+    await tutorServices.registrarNota(claseId, nota);
     res.status(200).json({ message: "Notas registradas" });
   }
 
   async getClasesAsignadas(req: Request, res: Response) {
-    const response = req.body;
-    const tutorId = response.tutorId;
+    const tutorId = Number(req.params.id);
     const clases = await tutorServices.getClasesAsignadas(tutorId);
     res.json(clases);
   }
 
   async getAsistencias(req: Request, res: Response) {
-    const response = req.body;
-    const tutorId = response.tutorId;
+    const response = req.params;
+    const tutorId = Number(response.id);
+    console.log("Tutor ID:", tutorId);
     const asistencias = await tutorServices.getAsistencias(tutorId);
     if (!asistencias) {
       return res.status(404).json({ message: "No asistencias found" });

@@ -1,6 +1,7 @@
 import { pool } from "../config/db";
 import { Tutor } from "../models/personas/tutor";
 import { IUserServices } from "../interfaces/userservices";
+import { INote } from "../interfaces/INotes";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { config } from "../config/config";
@@ -50,13 +51,13 @@ export class TutorServices implements IUserServices {
     }
   }
 
-  async registrarNota(claseId: number, notas: { participanteId: number, nota: number, observaciones?: string }[]): Promise<void> {
-    for (const nota of notas) {
+  async registrarNota(claseId: number, nota: INote): Promise<void> {
+    nota.clase_id= claseId;
       await pool.query(
         "INSERT INTO calificacion (clase_id, participante_id, nota, observaciones) VALUES ($1, $2, $3, $4) ON CONFLICT (clase_id, participante_id) DO UPDATE SET nota = $3, observaciones = $4",
-        [claseId, nota.participanteId, nota.nota, nota.observaciones || null]
+        [nota.clase_id, nota.participante_id, nota.nota, nota.observaciones || null]
       );
-    }
+
   }
 
   async getClasesAsignadas(tutorId: number) {

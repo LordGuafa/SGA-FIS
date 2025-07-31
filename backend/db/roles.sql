@@ -42,5 +42,7 @@ GRANT SELECT ON
 	vista_participante_inscripciones
 	TO app_user;
 
+GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO app_user;
+
 -- Otorgar permisos de ejecución sobre funciones necesarias
 GRANT EXECUTE ON FUNCTION es_sincronico(INT, INT) TO app_user;
