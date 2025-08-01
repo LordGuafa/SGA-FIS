@@ -79,4 +79,35 @@ export class AdminController {
     await this.services.deletePersonal(Number(req.params.id));
     res.status(204).send();
   };
+
+  createCurso = async (req: Request, res: Response) => {
+    const newCurso = await this.services.createCurso(req.body);
+    res.status(201).json(newCurso);
+  }
+
+  createInscripcionParticipante = async (req: Request, res: Response) => {
+    const response = req.body;
+    const newInscripcion = await this.services.createInscripcionParticipante(req.body.participante_id, req.body.curso_id);
+    res.status(201).json(newInscripcion);
+  }
+
+  updateCurso = async (req: Request, res: Response) => {
+    const updatedCurso = await this.services.updateCurso(
+      Number(req.params.id),
+      req.body
+    );
+    if (updatedCurso) return res.json(updatedCurso);
+    res.status(404).json({ message: "Curso not found" });
+  }
+
+  updateInscripcionParticipante = async (req: Request, res: Response) => {
+    const updatedInscripcion = await this.services.updateInscripcionParticipante(
+      Number(req.params.id),
+      req.body.participante_id,
+      req.body.curso_id
+    );
+    if (updatedInscripcion) return res.json(updatedInscripcion);
+    res.status(404).json({ message: "Inscription not found" });
+  }
+
 }

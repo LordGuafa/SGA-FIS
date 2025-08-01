@@ -3,6 +3,7 @@ import { Admin } from "../models/personas/admin";
 import { Participante } from "../models/personas/participante";
 import { Tutor } from "../models/personas/tutor";
 import { IUserServices } from "../interfaces/userservices";
+import { ICourse } from "../interfaces/ICourses";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -213,11 +214,23 @@ async deletePersonal(id: number): Promise<void> {
     return result.rows[0];
   }
 
-  async updateCurso(id: number, curso: any) {
-    await pool.query(
-      `UPDATE cursos SET nombre = $1, descripcion = $2 WHERE id = $3`,
-      [curso.nombre, curso.descripcion, id]
+  async updateCurso(id: number, curso: Partial<ICourse>): Promise<ICourse | null> {
+    const fields = [];
+    const values = [];
+    let index = 1;
+    for (const [key, value] of Object.entries(curso)) {
+      fields.push(`${key} = $${index}`);
+      values.push(value);
+      index++;
+    }
+    values.push(id);
+    const res = await pool.query(
+      `UPDATE curso SET ${fields.join(
+        ", "
+      )} WHERE id = $${index} RETURNING *`,
+      values
     );
+    return res.rows[0] || null;
   }
 
   async deleteCurso(id: number) {
@@ -244,32 +257,50 @@ async deletePersonal(id: number): Promise<void> {
     );
   }
   // Métodos para inscripciones
-  async createInscripcion(participante_id: number, curso_id: number) {
+  async createInscripcionParticipante(participante_id: number, curso_id: number) {
     const result = await pool.query(
       `INSERT INTO inscripciones (participante_id, curso_id) VALUES ($1, $2) RETURNING *`,
       [participante_id, curso_id]
     );
     return result.rows[0];
   }
-
-  async updateInscripcion(
-    id: number,
-    participante_id: number,
-    curso_id: number
-  ) {
+  
+  async updateInscripcionParticipante(id: number, participante_id: number, curso_id: number) {
     await pool.query(
       `UPDATE inscripciones SET participante_id = $1, curso_id = $2 WHERE id = $3`,
       [participante_id, curso_id, id]
     );
   }
 
-  async deleteInscripcion(id: number) {
+  async deleteInscripcionParticipante(id: number) {
     await pool.query(`DELETE FROM inscripciones WHERE id = $1`, [id]);
   }
 
-  async listInscripciones() {
+  async listInscripcionesParticipantes() {
     const result = await pool.query(`SELECT * FROM inscripciones`);
     return result.rows;
+  }
+
+  async createAsignarTutor(tutor_id: number, curso_id: number) {
+    const result = await pool.query(
+      `INSERT INTO tutores_cursos (tutor_id, curso_id) VALUES ($1, $2) RETURNING *`,
+      [tutor_id, curso_id]
+    );
+  }
+
+  async updateAsignarTutor(
+    id: number,
+    tutor_id: number,
+    curso_id: number
+  ) {
+    await pool.query(
+      `UPDATE tutores_cursos SET tutor_id = $1, curso_id = $2 WHERE id = $3`,
+      [tutor_id, curso_id, id]
+    );
+  }
+
+  async deleteAsignarTutor(id: number) {
+    await pool.query(`DELETE FROM tutores_cursos WHERE id = $1`, [id]);
   }
 
   // Métodos para notas y asistencias

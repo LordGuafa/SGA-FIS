@@ -3,7 +3,7 @@ import { CalificacionServices } from "../services/calificacion.services";
 
 const service = new CalificacionServices()
 
-export class CalificacionController {
+export class ParticipanteController {
   getCalificaciones = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = await service.getAllCalificaciones();
@@ -52,4 +52,4 @@ export class CalificacionController {
   };
 }
 
-export const calificacionController = new CalificacionController();
+export const calificacionController = new ParticipanteController();

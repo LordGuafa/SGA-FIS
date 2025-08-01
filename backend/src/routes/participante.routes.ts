@@ -1,7 +1,6 @@
-// routes/calificacion.routes.ts
 import { Router } from 'express';
 import { checkRole } from '../middlewares/roleCheck.middleware.';
-import { calificacionController } from '../controllers/calificacion.controller';
+import { calificacionController } from '../controllers/participante.controller';
 
 const participanteRouter = Router();
 

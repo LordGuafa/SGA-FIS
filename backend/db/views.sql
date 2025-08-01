@@ -1,125 +1,55 @@
--- Vista de inscripciones de participantes a cursos
-CREATE OR REPLACE VIEW vista_participante_inscripciones AS
+-- Vista de tutores con sus cursos asignados
+CREATE OR REPLACE VIEW vista_tutores_cursos AS
 SELECT
-    p.id AS participante_id,
-    p.nombre AS participante_nombre,
-    p.email,
-    cd.nombre AS departamento,
+    p.id AS tutor_id,
+    p.nombre AS tutor_nombre,
     c.id AS curso_id,
     c.nombre AS curso_nombre,
-    cm.nombre AS modalidad,
-    i.fecha_inscripcion
-FROM
-    participante p
-    JOIN catalogo_departamento cd ON p.departamento_id = cd.id
-    JOIN inscripcion i ON i.participante_id = p.id
-    JOIN curso c ON c.id = i.curso_id
-    JOIN catalogo_modalidad cm ON cm.id = i.modalidad_id;
+    atc.fecha_asignacion
+FROM asignacion_tutor_curso atc
+JOIN personal p ON p.id = atc.tutor_id
+JOIN curso c ON c.id = atc.curso_id
+WHERE p.rol_id = (SELECT id FROM catalogo_rol WHERE nombre = 'tutor')
+ORDER BY p.nombre, c.nombre;
 
--- Vista de asistencias de participantes a clases
-CREATE OR REPLACE VIEW vista_participante_asistencias AS
+-- Vista para participantes: historial de notas y asistencias
+CREATE OR REPLACE VIEW vista_participante AS
 SELECT
-    a.participante_id,
-    cl.id AS clase_id,
+    part.id AS participante_id,
+    part.nombre AS participante_nombre,
+    c.nombre AS curso,
+    cm.nombre AS modalidad,
     cl.fecha AS fecha_clase,
     cl.tema,
-    c.nombre AS curso,
-    a.presente
-FROM
-    asistencia a
-    JOIN clase cl ON cl.id = a.clase_id
-    JOIN curso c ON c.id = cl.curso_id;
-
--- Vista de calificaciones de participantes en clases
-CREATE OR REPLACE VIEW vista_participante_calificaciones AS
-SELECT cal.participante_id, cl.id AS clase_id, cl.tema, cl.fecha, c.nombre AS curso, cal.nota, cal.observaciones
-FROM
-    calificacion cal
-    JOIN clase cl ON cl.id = cal.clase_id
-    JOIN curso c ON c.id = cl.curso_id;
-
--- Vista de clases dictadas por tutores
-CREATE OR REPLACE VIEW vista_tutor_clases AS
-SELECT
-    cl.id AS clase_id,
-    cl.fecha,
-    cl.tema,
-    c.id AS curso_id,
-    c.nombre AS curso,
-    t.id AS tutor_id,
-    t.nombre AS tutor
-FROM
-    clase cl
-    JOIN curso c ON c.id = cl.curso_id
-    JOIN personal t ON t.id = cl.tutor_id;
-
--- Vista de asistencias por clase y tutor
-CREATE OR REPLACE VIEW vista_tutor_asistencias AS
-SELECT
-    t.id AS tutor_id,
-    cl.id AS clase_id,
-    cl.tema,
-    cl.fecha,
-    p.id AS participante_id,
-    p.nombre AS participante,
-    a.presente
-FROM
-    clase cl
-    JOIN personal t ON t.id = cl.tutor_id
-    JOIN asistencia a ON a.clase_id = cl.id
-    JOIN participante p ON p.id = a.participante_id;
-
--- Vista de calificaciones por clase y tutor
-CREATE OR REPLACE VIEW vista_tutor_calificaciones AS
-SELECT
-    t.id AS tutor_id,
-    cl.id AS clase_id,
-    cl.tema,
-    cl.fecha,
-    p.id AS participante_id,
-    p.nombre AS participante,
     cal.nota,
-    cal.observaciones
-FROM
-    clase cl
-    JOIN personal t ON t.id = cl.tutor_id
-    JOIN calificacion cal ON cal.clase_id = cl.id
-    JOIN participante p ON p.id = cal.participante_id;
+    cal.observaciones,
+    a.presente
+FROM participante part
+JOIN inscripcion i ON i.participante_id = part.id
+JOIN curso c ON c.id = i.curso_id
+JOIN catalogo_modalidad cm ON cm.id = i.modalidad_id
+LEFT JOIN clase cl ON cl.curso_id = c.id
+LEFT JOIN calificacion cal ON cal.clase_id = cl.id AND cal.participante_id = part.id
+LEFT JOIN asistencia a ON a.clase_id = cl.id AND a.participante_id = part.id;
 
--- Vista de control general de participantes, cursos, clases, asistencias y calificaciones
-CREATE OR REPLACE VIEW vista_control_general AS
+-- Vista para administradores: resumen de usuarios y cursos
+CREATE OR REPLACE VIEW vista_admin_resumen AS
 SELECT
-    p.id AS participante_id,
-    p.nombre AS participante,
-    cd.nombre AS departamento,
-    c.nombre AS curso,
-    cm.nombre AS modalidad,
-    i.fecha_inscripcion,
-    cl.fecha AS fecha_clase,
-    cl.tema,
-    a.presente,
-    cal.nota
-FROM
-    participante p
-    JOIN catalogo_departamento cd ON cd.id = p.departamento_id
-    JOIN inscripcion i ON i.participante_id = p.id
-    JOIN curso c ON c.id = i.curso_id
-    JOIN catalogo_modalidad cm ON cm.id = i.modalidad_id
-    LEFT JOIN asistencia a ON a.participante_id = p.id
-    LEFT JOIN clase cl ON cl.id = a.clase_id
-    LEFT JOIN calificacion cal ON cal.participante_id = p.id
-    AND cal.clase_id = cl.id;
-
--- Vista de detalle de personal (administrativos y tutores)
-CREATE OR REPLACE VIEW vista_personal_detalle AS
-SELECT per.id, per.nombre, per.email, cr.nombre AS rol
-FROM personal per
-    JOIN catalogo_rol cr ON cr.id = per.rol_id;
-
--- Vista de detalle de participantes
-CREATE OR REPLACE VIEW vista_participante_detalle AS
-SELECT p.id, p.nombre, p.email, cd.nombre AS departamento, cr.nombre AS rol
-FROM
-    participante p
-    JOIN catalogo_departamento cd ON cd.id = p.departamento_id
-    JOIN catalogo_rol cr ON cr.id = p.rol_id;
+    p.id,
+    p.nombre,
+    cr.nombre AS rol,
+    p.email,
+    p.contact1,
+    p.contact2
+FROM personal p
+JOIN catalogo_rol cr ON cr.id = p.rol_id
+UNION
+SELECT
+    pa.id,
+    pa.nombre,
+    cr.nombre AS rol,
+    pa.email,
+    pa.contact1,
+    pa.contact2
+FROM participante pa
+JOIN catalogo_rol cr ON cr.id = pa.rol_id;
