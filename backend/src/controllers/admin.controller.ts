@@ -36,7 +36,7 @@ export class AdminController {
     res.status(200).json(personal);
   };
 
-  getPersonalBtId = async (req: Request, res: Response) => {
+  getPersonalById = async (req: Request, res: Response) => {
     const tutor = await this.services.getTutorById(Number(req.params.id));
     if (tutor) return res.status(200).json(tutor);
     return res.status(404).json({ message: "Tutor not found" });
@@ -80,6 +80,11 @@ export class AdminController {
     res.status(204).send();
   };
 
+  getCursos = async (req: Request, res: Response) => {
+    const cursos = await this.services.listCursos();
+    res.status(200).json(cursos);
+  }
+
   createCurso = async (req: Request, res: Response) => {
     const newCurso = await this.services.createCurso(req.body);
     res.status(201).json(newCurso);
@@ -89,6 +94,12 @@ export class AdminController {
     const response = req.body;
     const newInscripcion = await this.services.createInscripcionParticipante(response);
     res.status(201).json(newInscripcion);
+  }
+
+  getInscripcionParticipante = async (req: Request, res: Response) => {
+    const inscripcion = await this.services.listInscripcionesParticipantes();  
+    if (inscripcion) return res.status(200).json(inscripcion);
+    res.status(404).json({ message: "Inscripcion not found" });
   }
 
   updateCurso = async (req: Request, res: Response) => {
@@ -108,6 +119,41 @@ export class AdminController {
     res.status(401).json({ message: "Something went wrong :(" });
   }
 
+  deleteCurso = async (req: Request, res: Response) => {
+    await this.services.deleteCurso(Number(req.params.id));
+    res.status(204).send();
+  }
+
+  deleteInscripcionParticipante = async (req: Request, res: Response) => {
+    await this.services.deleteInscripcionParticipante(Number(req.params.id));
+    res.status(204).send();
+  }
+
+  createAsignacion = async (req: Request, res: Response) => {
+    const response = req.body;
+    const newAsignacion = await this.services.createAsignarTutor(response);
+    res.status(201).json(newAsignacion);
+  }
+
+  getAsignaciones = async (req: Request, res: Response) => {
+    const asignaciones = await this.services.listAsignaciones();
+    res.status(200).json(asignaciones);
+  }
+
+  updateAsignacion = async (req: Request, res: Response) => {
+    const updates = req.body;
+    const id = Number(req.params.id);
+    const updatedAsignacion = await this.services.updateAsignarTutor(id, updates);
+    if (updatedAsignacion) return res.status(201).json(updatedAsignacion);
+    res.status(401).json({ message: "Something went wrong :(" });
+  }
+
+  deleteAsignacion = async (req: Request, res: Response) => {
+    await this.services.deleteAsignarTutor(Number(req.params.id));
+    res.status(204).send();
+  }
+
+  
 //TODO: llamar los sercivios de inscripciones y asignaciones  
 
 }

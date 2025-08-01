@@ -44,10 +44,29 @@ adminRouter.delete(
 
 // Personal
 adminRouter.get("/personal", checkRole(1), adminController.getPersonal);
-adminRouter.get("/personal/:id", checkRole(1), adminController.getPersonalBtId);
+adminRouter.get("/personal/:id", checkRole(1), adminController.getPersonalById);
 adminRouter.post("/personal", checkRole(1), adminController.createPersonal);
 adminRouter.put("/personal/:id", checkRole(1), adminController.updatePersonal);
 adminRouter.delete("/personal/:id", checkRole(1), adminController.deletePersonal);
 
 //TODO: Implementar los endpoints de cursos, inscripciones y asignaciones
+
+// Cursos
+adminRouter.get("/cursos", checkRole(1), adminController.getCursos);
+adminRouter.post("/cursos", checkRole(1), adminController.createCurso);
+adminRouter.put("/cursos/:id", checkRole(1), adminController.updateCurso);
+adminRouter.delete("/cursos/:id", checkRole(1), adminController.deleteCurso);
+
+// Inscripciones
+adminRouter.get("/inscripciones", checkRole(1), adminController.getInscripcionParticipante);
+adminRouter.post("/inscripciones", checkRole(1), adminController.createInscripcionParticipante);
+adminRouter.put("/inscripciones/:id", checkRole(1), adminController.updateInscripcionParticipante);
+adminRouter.delete("/inscripciones/:id", checkRole(1), adminController.deleteInscripcionParticipante);
+
+// Asignaciones
+adminRouter.get("/asignaciones", checkRole(1), adminController.getAsignaciones);
+adminRouter.post("/asignaciones", checkRole(1), adminController.createAsignacion);
+adminRouter.put("/asignaciones/:id", checkRole(1), adminController.updateAsignacion);
+adminRouter.delete("/asignaciones/:id", checkRole(1), adminController.deleteAsignacion);
+
 export default adminRouter;

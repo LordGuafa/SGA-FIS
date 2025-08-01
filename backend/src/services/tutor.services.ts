@@ -83,4 +83,45 @@ export class TutorServices implements IUserServices {
     );
     return res.rows;
   }
+
+  async updateAsistencia(id: number, estado: string): Promise<void> {
+    await pool.query(`UPDATE asistencias SET estado = $1 WHERE id = $2`, [
+      estado,
+      id,
+    ]);
+  }
+
+  async deleteAsistencia(claseId: number, participanteId: number): Promise<void> {
+    await pool.query(
+      "DELETE FROM asistencia WHERE clase_id = $1 AND participante_id = $2",
+      [claseId, participanteId]
+    );
+  }
+
+  async updateNota(id: number, nota: Partial<INote>): Promise<INote | null> {
+    const fields = [];
+    const values = [];
+    let index = 1;
+    for (const [key, value] of Object.entries(nota)) {
+      fields.push(`${key} = $${index}`);
+      values.push(value);
+      index++;
+    }
+    values.push(id);
+    const res = await pool.query(
+      `UPDATE curso SET ${fields.join(
+        ", "
+      )} WHERE id = $${index} RETURNING *`,
+      values
+    );
+    return res.rows[0] || null;
+  }
+
+  async deleteNota(claseId: number, participanteId: number): Promise<void> {
+    await pool.query(
+      "DELETE FROM calificacion WHERE clase_id = $1 AND participante_id = $2",
+      [claseId, participanteId]
+    );
+  }
+
 }

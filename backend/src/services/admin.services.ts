@@ -268,7 +268,7 @@ async deletePersonal(id: number): Promise<void> {
   }
   
   async updateInscripcionParticipante(id: number, inscripcion: Partial<IInscription>):Promise<IInscription | null> {
- const fields = [];
+    const fields = [];
     const values = [];
     let index = 1;
     for (const [key, value] of Object.entries(inscripcion)) {
@@ -295,26 +295,40 @@ async deletePersonal(id: number): Promise<void> {
     return result.rows;
   }
 
-  async createAsignarTutor(tutor_id: number, curso_id: number) {
+  async createAsignarTutor(newAsignacion: IAssign): Promise<IAssign> {
     const result = await pool.query(
       `INSERT INTO tutores_cursos (tutor_id, curso_id) VALUES ($1, $2) RETURNING *`,
-      [tutor_id, curso_id]
+      [newAsignacion.tutor_id, newAsignacion.curso_id]
     );
+    return result.rows[0];
   }
 
-  async updateAsignarTutor(
-    id: number,
-    tutor_id: number,
-    curso_id: number
-  ) {
-    await pool.query(
-      `UPDATE tutores_cursos SET tutor_id = $1, curso_id = $2 WHERE id = $3`,
-      [tutor_id, curso_id, id]
+  async updateAsignarTutor(id: number, asignaciones: Partial<IAssign>): Promise<IAssign | null> {
+    const fields = [];
+    const values = [];
+    let index = 1;
+    for (const [key, value] of Object.entries(asignaciones)) {
+      fields.push(`${key} = $${index}`);
+      values.push(value);
+      index++;
+    }
+    values.push(id);
+    const res = await pool.query(
+      `UPDATE curso SET ${fields.join(
+        ", "
+      )} WHERE id = $${index} RETURNING *`,
+      values
     );
+    return res.rows[0] || null
   }
 
   async deleteAsignarTutor(id: number) {
     await pool.query(`DELETE FROM tutores_cursos WHERE id = $1`, [id]);
+  }
+
+  async listAsignaciones() {
+    const result = await pool.query(`SELECT * FROM tutores_cursos`);
+    return result.rows;
   }
 
   // Métodos para notas y asistencias

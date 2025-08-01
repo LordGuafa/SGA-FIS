@@ -67,4 +67,29 @@ export class TutorController {
     }
     res.status(200).json(calificaciones);
   }
+  
+  async updateAsistencia(req: Request, res: Response) {
+    const { claseId, asistencias } = req.body;
+    await tutorServices.updateAsistencia(claseId, asistencias);
+    res.status(200).json({ message: "Asistencias actualizadas" });
+  }
+
+  async updateNota(req: Request, res: Response) {
+    const { claseId, nota } = req.body;
+    await tutorServices.registrarNota(claseId, nota);
+    res.status(200).json({ message: "Nota actualizada" });
+  }
+
+  async deleteAsistencia(req: Request, res: Response) {
+    const { claseId, participanteId } = req.body;
+    await tutorServices.deleteAsistencia(claseId, participanteId);
+    res.status(204).send();
+  }
+
+  async deleteNota(req: Request, res: Response) {
+    const { claseId, participanteId } = req.body;
+    await tutorServices.deleteNota(claseId, participanteId);
+    res.status(204).send();
+  }
+  
 }
