@@ -1,13 +1,15 @@
+import bcrypt from "bcrypt";
+import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
+import { config } from "../config/config";
 import { pool } from "../config/db";
+import { ICourse } from "../interfaces/ICourses";
+import { IInscription } from "../interfaces/IInscriptions";
+import { IUserServices } from "../interfaces/userservices";
 import { Admin } from "../models/personas/admin";
 import { Participante } from "../models/personas/participante";
 import { Tutor } from "../models/personas/tutor";
-import { IUserServices } from "../interfaces/userservices";
-import { ICourse } from "../interfaces/ICourses";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-import { config } from "../config/config";
+import { IAssign } from "../interfaces/IAssigns";
 
 export class AdminServices implements IUserServices {
   async login(email: string, password: string): Promise<string | null> {
@@ -206,10 +208,10 @@ async deletePersonal(id: number): Promise<void> {
     }
   }
 }
-  async createCurso(curso: any) {
+  async createCurso(curso: ICourse): Promise<ICourse> {
     const result = await pool.query(
       `INSERT INTO cursos (nombre, descripcion) VALUES ($1, $2) RETURNING *`,
-      [curso.nombre, curso.descripcion]
+      [curso.name, curso.description]
     );
     return result.rows[0];
   }
@@ -242,10 +244,10 @@ async deletePersonal(id: number): Promise<void> {
     return result.rows;
   }
 
-  async assignTutor(tutor_id: number, curso_id: number) {
+  async assignTutor(assignTutor:IAssign): Promise<IAssign> {
     const result = await pool.query(
       `INSERT INTO tutores_cursos (tutor_id, curso_id) VALUES ($1, $2) RETURNING *`,
-      [tutor_id, curso_id]
+      [assignTutor.tutor_id, assignTutor.curso_id]
     );
     return result.rows[0];
   }
@@ -257,19 +259,31 @@ async deletePersonal(id: number): Promise<void> {
     );
   }
   // Métodos para inscripciones
-  async createInscripcionParticipante(participante_id: number, curso_id: number) {
+  async createInscripcionParticipante(newInscripcion: IInscription): Promise<IInscription> {
     const result = await pool.query(
       `INSERT INTO inscripciones (participante_id, curso_id) VALUES ($1, $2) RETURNING *`,
-      [participante_id, curso_id]
+      [newInscripcion.participante_id, newInscripcion.curso_id]
     );
     return result.rows[0];
   }
   
-  async updateInscripcionParticipante(id: number, participante_id: number, curso_id: number) {
-    await pool.query(
-      `UPDATE inscripciones SET participante_id = $1, curso_id = $2 WHERE id = $3`,
-      [participante_id, curso_id, id]
+  async updateInscripcionParticipante(id: number, inscripcion: Partial<IInscription>):Promise<IInscription | null> {
+ const fields = [];
+    const values = [];
+    let index = 1;
+    for (const [key, value] of Object.entries(inscripcion)) {
+      fields.push(`${key} = $${index}`);
+      values.push(value);
+      index++;
+    }
+    values.push(id);
+    const res = await pool.query(
+      `UPDATE curso SET ${fields.join(
+        ", "
+      )} WHERE id = $${index} RETURNING *`,
+      values
     );
+    return res.rows[0] || null;
   }
 
   async deleteInscripcionParticipante(id: number) {
@@ -354,3 +368,5 @@ async deletePersonal(id: number): Promise<void> {
     return result.rows;
   }
 }
+
+//TODO: Implementar los métodos de delete cursos y asignaciones

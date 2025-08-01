@@ -62,7 +62,7 @@ export class TutorServices implements IUserServices {
 
   async getClasesAsignadas(tutorId: number) {
     const res = await pool.query(
-      "SELECT * FROM vista_tutor_clases WHERE tutor_id = $1",
+      "SELECT * FROM vista_tutor_cursos WHERE tutor_id = $1",
       [tutorId]
     );
     return res.rows;
@@ -70,7 +70,7 @@ export class TutorServices implements IUserServices {
 
   async getAsistencias(tutorId: number) {
     const res = await pool.query(
-      "SELECT * FROM vista_tutor_asistencias WHERE tutor_id = $1",
+      "SELECT * FROM vista_asistencias_tutor WHERE tutor_id = $1",
       [tutorId]
     );
     return res.rows;
@@ -78,7 +78,7 @@ export class TutorServices implements IUserServices {
 
   async getCalificaciones(tutorId: number) {
     const res = await pool.query(
-      "SELECT * FROM vista_tutor_calificaciones WHERE tutor_id = $1",
+      "SELECT * FROM vista_notas_tutor WHERE tutor_id = $1",
       [tutorId]
     );
     return res.rows;

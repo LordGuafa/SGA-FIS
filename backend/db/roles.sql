@@ -20,7 +20,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON
     inscripcion,
     avance_autonomo,
     asistencia,
-    calificacion
+    calificacion,
+    asignacion_tutor_curso
 TO app_user;
 
 -- Permitir SELECT en tablas de catálogo (solo lectura)
@@ -32,17 +33,23 @@ TO app_user;
 
 -- Otorgar permisos SELECT sobre las vistas
 GRANT SELECT ON
-    vista_participante_detalle,
-    vista_personal_detalle,
-    vista_control_general,
-    vista_tutor_calificaciones,
-    vista_tutor_asistencias,
-    vista_tutor_clases,
-	vista_participante_asistencias,
-	vista_participante_inscripciones
-	TO app_user;
+    vista_asistencias_admin,
+    vista_notas_admin,
+    vista_inscripciones_admin,
+    vista_tutores_admin,
+    vista_asistencias_tutor,
+    vista_notas_tutor,
+    vista_asistencias_participante,
+    vista_notas_participante,
+    vista_tutor_cursos,
+    vista_participante_cursos,
+    vista_calificaciones_sincronicas
+TO app_user;
 
+-- Permitir uso y modificación de secuencias
 GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO app_user;
 
 -- Otorgar permisos de ejecución sobre funciones necesarias
 GRANT EXECUTE ON FUNCTION es_sincronico(INT, INT) TO app_user;
+
+SELECT * FROM vista_participante_cursos 

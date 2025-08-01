@@ -4,6 +4,8 @@ import { IUserServices } from "../interfaces/userservices";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { config } from "../config/config";
+import { ICourse } from "../interfaces/ICourses";
+import { INote } from "../interfaces/INotes";
 
 export class ParticipanteServices implements IUserServices {
   async login(email: string, password: string): Promise<string | null> {
@@ -54,27 +56,30 @@ export class ParticipanteServices implements IUserServices {
     return true;
   }
 
-  async getAsistencias(participanteId: number): Promise<any[]> {
-    // Solo asistencias de cursos sincrónicos
+  async listCursos(id: number): Promise<any[]> {
     const res = await pool.query(
-      `SELECT a.*, cl.curso_id, cl.fecha, cl.tema
-       FROM asistencia a
-       JOIN clase cl ON cl.id = a.clase_id
-       JOIN inscripcion i ON i.participante_id = a.participante_id AND i.curso_id = cl.curso_id
-       JOIN catalogo_modalidad cm ON cm.id = i.modalidad_id
-       WHERE a.participante_id = $1 AND cm.nombre = 'sincronica'`,
-      [participanteId]
+      "SELECT * FROM vista_participante_cursos WHERE participante_id = $1",
+      [id]
     );
     return res.rows;
   }
 
-  async getNotas(participanteId: number): Promise<any[]> {
+  async getAsistencias(
+    participanteId: number,
+    cursoId: number
+  ): Promise<any[]> {
+    // Solo asistencias de cursos sincrónicos
     const res = await pool.query(
-      `SELECT cal.*, cl.curso_id, cl.fecha, cl.tema
-       FROM calificacion cal
-       JOIN clase cl ON cl.id = cal.clase_id
-       WHERE cal.participante_id = $1`,
-      [participanteId]
+      "SELECT * FROM vista_asistencias_participante WHERE participante_id = $1 AND curso_id = $2",
+      [participanteId, cursoId]
+    );
+    return res.rows;
+  }
+
+  async getNotas(participanteId: number, cursoId: number): Promise<INote[]> {
+    const res = await pool.query(
+      `SELECT * FROM vista_notas_participante WHERE participante_id = $1 and curso_id = $2`,
+      [participanteId, cursoId]
     );
     return res.rows;
   }

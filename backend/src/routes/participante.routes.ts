@@ -4,12 +4,8 @@ import { calificacionController } from '../controllers/participante.controller';
 
 const participanteRouter = Router();
 
+//TODO implementar los endpoints
 // Estudiantes (rol 3) pueden ver sus propias calificaciones
 
-participanteRouter.get(
-  '/mis-calificaciones/:id',
-  checkRole(3),
-  calificacionController.getCalificacion 
-);
 
 export default participanteRouter;

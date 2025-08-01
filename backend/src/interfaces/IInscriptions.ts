@@ -1,6 +1,8 @@
 export interface IInscription {
-  id: number;
+  id?: number;
+  curso_id: number;
   participante_id: number;
-  course_id: number;
-  fecha_inscripcion: Date;
+  modalidad_id: number;
+  fecha_inscripcion?: Date;
+
 }

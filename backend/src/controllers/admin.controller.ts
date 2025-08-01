@@ -87,7 +87,7 @@ export class AdminController {
 
   createInscripcionParticipante = async (req: Request, res: Response) => {
     const response = req.body;
-    const newInscripcion = await this.services.createInscripcionParticipante(req.body.participante_id, req.body.curso_id);
+    const newInscripcion = await this.services.createInscripcionParticipante(response);
     res.status(201).json(newInscripcion);
   }
 
@@ -101,13 +101,13 @@ export class AdminController {
   }
 
   updateInscripcionParticipante = async (req: Request, res: Response) => {
-    const updatedInscripcion = await this.services.updateInscripcionParticipante(
-      Number(req.params.id),
-      req.body.participante_id,
-      req.body.curso_id
-    );
-    if (updatedInscripcion) return res.json(updatedInscripcion);
-    res.status(404).json({ message: "Inscription not found" });
+    const updates = req.body;
+    const id = Number(req.params.id);
+    const updatedInscripcion = await this.services.updateInscripcionParticipante(id, updates);
+    if (updatedInscripcion) return res.status(201).json(updatedInscripcion);
+    res.status(401).json({ message: "Something went wrong :(" });
   }
+
+//TODO: llamar los sercivios de inscripciones y asignaciones  
 
 }

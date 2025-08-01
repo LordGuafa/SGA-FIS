@@ -49,4 +49,5 @@ adminRouter.post("/personal", checkRole(1), adminController.createPersonal);
 adminRouter.put("/personal/:id", checkRole(1), adminController.updatePersonal);
 adminRouter.delete("/personal/:id", checkRole(1), adminController.deletePersonal);
 
+//TODO: Implementar los endpoints de cursos, inscripciones y asignaciones
 export default adminRouter;
