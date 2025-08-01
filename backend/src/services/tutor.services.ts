@@ -118,6 +118,14 @@ export class TutorServices implements IUserServices {
     return res.rows[0] || null;
   }
 
+  async listClasses(tutorId: number): Promise<IClass[]> {
+    const res = await pool.query(
+      "SELECT * FROM clase WHERE tutor_id = $1",
+      [tutorId]
+    );
+    return res.rows;
+  }
+
   async updateClass(id: number, clase: Partial<IClass>): Promise<IClass | null> {
      const fields = [];
     const values = [];

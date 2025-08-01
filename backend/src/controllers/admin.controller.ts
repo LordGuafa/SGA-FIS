@@ -85,6 +85,12 @@ export class AdminController {
     res.status(200).json(cursos);
   }
 
+  getCursoById = async (req: Request, res: Response) => {
+    const curso = await this.services.getCursoById(Number(req.params.id));
+    if (curso) return res.status(200).json(curso);
+    res.status(404).json({ message: "Curso not found" });
+  }
+
   createCurso = async (req: Request, res: Response) => {
     const newCurso = await this.services.createCurso(req.body);
     res.status(201).json(newCurso);
@@ -102,6 +108,12 @@ export class AdminController {
     res.status(404).json({ message: "Inscripcion not found" });
   }
 
+  getInscripcionById = async (req: Request, res: Response) => {
+    const inscripcion = await this.services.getInscripcionById(Number(req.params.id));
+    if (inscripcion) return res.status(200).json(inscripcion);
+    res.status(404).json({ message: "Inscripcion not found" });
+  }
+
   updateCurso = async (req: Request, res: Response) => {
     const updatedCurso = await this.services.updateCurso(
       Number(req.params.id),
@@ -114,9 +126,10 @@ export class AdminController {
   updateInscripcionParticipante = async (req: Request, res: Response) => {
     const updates = req.body;
     const id = Number(req.params.id);
+    console.log("Updating Inscripcion with ID:", id, "Updates:", updates);
     const updatedInscripcion = await this.services.updateInscripcionParticipante(id, updates);
     if (updatedInscripcion) return res.status(201).json(updatedInscripcion);
-    res.status(401).json({ message: "Something went wrong :(" });
+    res.status(404).json({ message: "Something went wrong :(" });
   }
 
   deleteCurso = async (req: Request, res: Response) => {
@@ -138,6 +151,12 @@ export class AdminController {
   getAsignaciones = async (req: Request, res: Response) => {
     const asignaciones = await this.services.listAsignaciones();
     res.status(200).json(asignaciones);
+  }
+
+  getAsignacionById = async (req: Request, res: Response) => {
+    const asignacion = await this.services.getAsignacionById(Number(req.params.id));
+    if (asignacion) return res.status(200).json(asignacion);
+    res.status(404).json({ message: "Asignacion not found" });
   }
 
   updateAsignacion = async (req: Request, res: Response) => {

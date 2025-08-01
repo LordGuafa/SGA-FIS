@@ -53,18 +53,21 @@ adminRouter.delete("/personal/:id", checkRole(1), adminController.deletePersonal
 
 // Cursos
 adminRouter.get("/cursos", checkRole(1), adminController.getCursos);
+adminRouter.get("/cursos/:id", checkRole(1), adminController.getCursoById);
 adminRouter.post("/cursos", checkRole(1), adminController.createCurso);
 adminRouter.put("/cursos/:id", checkRole(1), adminController.updateCurso);
 adminRouter.delete("/cursos/:id", checkRole(1), adminController.deleteCurso);
 
 // Inscripciones
 adminRouter.get("/inscripciones", checkRole(1), adminController.getInscripcionParticipante);
+adminRouter.get("/inscripciones/:id", checkRole(1), adminController.getInscripcionById);
 adminRouter.post("/inscripciones", checkRole(1), adminController.createInscripcionParticipante);
 adminRouter.put("/inscripciones/:id", checkRole(1), adminController.updateInscripcionParticipante);
 adminRouter.delete("/inscripciones/:id", checkRole(1), adminController.deleteInscripcionParticipante);
 
 // Asignaciones
 adminRouter.get("/asignaciones", checkRole(1), adminController.getAsignaciones);
+adminRouter.get("/asignaciones/:id", checkRole(1), adminController.getAsignacionById);
 adminRouter.post("/asignaciones", checkRole(1), adminController.createAsignacion);
 adminRouter.put("/asignaciones/:id", checkRole(1), adminController.updateAsignacion);
 adminRouter.delete("/asignaciones/:id", checkRole(1), adminController.deleteAsignacion);

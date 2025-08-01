@@ -38,7 +38,7 @@ export class TutorController {
     res.status(200).json({ message: "Notas registradas" });
   }
 
-  async getClasesAsignadas(req: Request, res: Response) {
+  async getCursosAsignados(req: Request, res: Response) {
     const tutorId = Number(req.params.id);
     const clases = await tutorServices.getClasesAsignadas(tutorId);
     res.json(clases);
@@ -60,6 +60,15 @@ export class TutorController {
       return res.status(404).json({ message: "Class not found" });
     }
     res.status(200).json(clase);
+  }
+
+  async getClasses(req: Request, res: Response) {
+    const tutorId = Number(req.params.id);
+    const clases = await tutorServices.getClasesAsignadas(tutorId);
+    if (!clases) {
+      return res.status(404).json({ message: "No classes found" });
+    }
+    res.status(200).json(clases);
   }
 
   async updateClass(req: Request, res: Response) {
