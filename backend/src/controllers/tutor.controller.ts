@@ -3,7 +3,6 @@ import { TutorServices } from "../services/tutor.services";
 import { INote } from "../interfaces/INotes";
 const tutorServices = new TutorServices();
 
-//TODO:Corregir los cómo se envía la información a los servicios
 export class TutorController {
   async login(req: Request, res: Response) {
     const { email, password } = req.body;
@@ -43,6 +42,40 @@ export class TutorController {
     const tutorId = Number(req.params.id);
     const clases = await tutorServices.getClasesAsignadas(tutorId);
     res.json(clases);
+  }
+
+  async createClass(req: Request, res: Response) {
+    const clase = req.body;
+    const createdClass = await tutorServices.createClass(clase);
+    if (!createdClass) {
+      return res.status(400).json({ message: "Failed to create class" });
+    }
+    res.status(201).json(createdClass);
+  }
+
+  async getClassById(req: Request, res: Response) {
+    const classId = Number(req.params.id);
+    const clase = await tutorServices.getClassById(classId);
+    if (!clase) {
+      return res.status(404).json({ message: "Class not found" });
+    }
+    res.status(200).json(clase);
+  }
+
+  async updateClass(req: Request, res: Response) {
+    const classId = Number(req.params.id);
+    const clase = req.body;
+    const updatedClass = await tutorServices.updateClass(classId, clase);
+    if (!updatedClass) {
+      return res.status(404).json({ message: "Class not found" });
+    }
+    res.status(200).json(updatedClass);
+  }
+
+  async deleteClass(req: Request, res: Response) {
+    const classId = Number(req.params.id);
+    await tutorServices.deleteClass(classId);
+    res.status(204).send();
   }
 
   async getAsistencias(req: Request, res: Response) {

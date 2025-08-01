@@ -105,14 +105,20 @@ export class TutorServices implements IUserServices {
     );
     return res.rows;
   }
-  async creteClass(clase: IClass) {
+  async createClass(clase: IClass) {
     const res = await pool.query(
       "INSERT INTO clase (curso_id, tutor_id, fecha, tema) VALUES($1, $2, $3,$4) RETURNING *",
       [clase.curso_id, clase.tutor_id, clase.fecha, clase.tema]
     );
     return res.rows[0];
   }
-  async updateClass(id: number, clase: Partial<IClass>) {
+
+  async getClassById(id: number): Promise<IClass | null> {
+    const res = await pool.query("SELECT * FROM clase WHERE id = $1", [id]);
+    return res.rows[0] || null;
+  }
+
+  async updateClass(id: number, clase: Partial<IClass>): Promise<IClass | null> {
      const fields = [];
     const values = [];
     let index = 1;
@@ -129,6 +135,10 @@ export class TutorServices implements IUserServices {
       values
     );
     return res.rows[0] || null;
+  }
+
+  async deleteClass(id: number): Promise<void> {
+    await pool.query("DELETE FROM clase WHERE id = $1", [id]);
   }
 
   async getAsistencias(tutorId: number) {
