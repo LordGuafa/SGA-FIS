@@ -180,7 +180,6 @@ export class AdminServices implements IUserServices {
   }
 
   async deleteParticipante(id: number): Promise<void> {
-    //TODO: Verificar si el participante tiene inscripciones o asistencias antes de eliminar
     const res = await pool.query("DELETE FROM participante WHERE id = $1", [
       id,
     ]);
@@ -199,7 +198,7 @@ async deletePersonal(id: number): Promise<void> {
         "UPDATE clase SET tutor_id = 0 WHERE tutor_id = $1",
         [id]
       );
-      // Puedes agregar aquí más actualizaciones si hay otras tablas que referencian a personal.id
+
 
       // Intenta eliminar de nuevo
       await pool.query("DELETE FROM personal WHERE id = $1", [id]);

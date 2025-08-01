@@ -5,6 +5,8 @@ import { INote } from "../interfaces/INotes";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { config } from "../config/config";
+import { IAttendance } from "../interfaces/IAttendances";
+import { IClass } from "../interfaces/IClass";
 
 export class TutorServices implements IUserServices {
   async login(email: string, password: string): Promise<string | null> {
@@ -31,33 +33,69 @@ export class TutorServices implements IUserServices {
     return token;
   }
 
-  async changePassword(id: number, oldPassword: string, newPassword: string): Promise<Boolean> {
-    const query = await pool.query("SELECT * FROM personal WHERE id = $1 AND rol_id = 2", [id]);
+  async changePassword(
+    id: number,
+    oldPassword: string,
+    newPassword: string
+  ): Promise<Boolean> {
+    const query = await pool.query(
+      "SELECT * FROM personal WHERE id = $1 AND rol_id = 2",
+      [id]
+    );
     const user: Tutor = query.rows[0];
     if (!user) return false;
     const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
     if (!isOldPasswordValid) return false;
-    const hashedNewPassword = await bcrypt.hash(newPassword, config.SALT_ROUNDS);
-    await pool.query("UPDATE personal SET password = $1 WHERE id = $2", [hashedNewPassword, id]);
+    const hashedNewPassword = await bcrypt.hash(
+      newPassword,
+      config.SALT_ROUNDS
+    );
+    await pool.query("UPDATE personal SET password = $1 WHERE id = $2", [
+      hashedNewPassword,
+      id,
+    ]);
     return true;
   }
 
-  async registrarAsistencia(claseId: number, asistencias: { participanteId: number, presente: boolean }[]): Promise<void> {
-    for (const asistencia of asistencias) {
-      await pool.query(
-        "INSERT INTO asistencia (clase_id, participante_id, presente) VALUES ($1, $2, $3) ON CONFLICT (clase_id, participante_id) DO UPDATE SET presente = $3",
-        [claseId, asistencia.participanteId, asistencia.presente]
-      );
-    }
+  async registrarAsistencia(data: IAttendance) {
+    const query = `
+      INSERT INTO asistencia (clase_id, participante_id, presente)
+      SELECT $2, $3, $4
+      FROM clase c
+      JOIN asignacion_tutor_curso atc ON atc.curso_id = c.curso_id
+      JOIN inscripcion i ON i.curso_id = c.curso_id AND i.participante_id = $3
+      WHERE c.id = $2
+        AND atc.tutor_id = $1
+        AND es_sincronico($3, c.curso_id) = true
+      ON CONFLICT (clase_id, participante_id)
+      DO UPDATE SET presente = EXCLUDED.presente
+    `;
+    await pool.query(query, [
+      data.tutorId,
+      data.claseId,
+      data.participanteId,
+      data.presente,
+    ]);
   }
 
-  async registrarNota(claseId: number, nota: INote): Promise<void> {
-    nota.clase_id= claseId;
-      await pool.query(
-        "INSERT INTO calificacion (clase_id, participante_id, nota, observaciones) VALUES ($1, $2, $3, $4) ON CONFLICT (clase_id, participante_id) DO UPDATE SET nota = $3, observaciones = $4",
-        [nota.clase_id, nota.participante_id, nota.nota, nota.observaciones || null]
-      );
-
+  async registrarNota(data: INote) {
+    const query = `
+      INSERT INTO calificacion (clase_id, participante_id, nota, observaciones)
+      SELECT $2, $3, $4, $5
+      FROM clase c
+      JOIN asignacion_tutor_curso atc ON atc.curso_id = c.curso_id
+      JOIN inscripcion i ON i.curso_id = c.curso_id AND i.participante_id = $3
+      WHERE c.id = $2 AND atc.tutor_id = $1
+      ON CONFLICT (clase_id, participante_id)
+      DO UPDATE SET nota = EXCLUDED.nota, observaciones = EXCLUDED.observaciones
+    `;
+    await pool.query(query, [
+      data.tutorId,
+      data.claseId,
+      data.participanteId,
+      data.nota,
+      data.observaciones,
+    ]);
   }
 
   async getClasesAsignadas(tutorId: number) {
@@ -66,6 +104,31 @@ export class TutorServices implements IUserServices {
       [tutorId]
     );
     return res.rows;
+  }
+  async creteClass(clase: IClass) {
+    const res = await pool.query(
+      "INSERT INTO clase (curso_id, tutor_id, fecha, tema) VALUES($1, $2, $3,$4) RETURNING *",
+      [clase.curso_id, clase.tutor_id, clase.fecha, clase.tema]
+    );
+    return res.rows[0];
+  }
+  async updateClass(id: number, clase: Partial<IClass>) {
+     const fields = [];
+    const values = [];
+    let index = 1;
+    for (const [key, value] of Object.entries(clase)) {
+      fields.push(`${key} = $${index}`);
+      values.push(value);
+      index++;
+    }
+    values.push(id);
+    const res = await pool.query(
+      `UPDATE participante SET ${fields.join(
+        ", "
+      )} WHERE id = $${index} RETURNING *`,
+      values
+    );
+    return res.rows[0] || null;
   }
 
   async getAsistencias(tutorId: number) {
@@ -91,7 +154,10 @@ export class TutorServices implements IUserServices {
     ]);
   }
 
-  async deleteAsistencia(claseId: number, participanteId: number): Promise<void> {
+  async deleteAsistencia(
+    claseId: number,
+    participanteId: number
+  ): Promise<void> {
     await pool.query(
       "DELETE FROM asistencia WHERE clase_id = $1 AND participante_id = $2",
       [claseId, participanteId]
@@ -109,9 +175,7 @@ export class TutorServices implements IUserServices {
     }
     values.push(id);
     const res = await pool.query(
-      `UPDATE curso SET ${fields.join(
-        ", "
-      )} WHERE id = $${index} RETURNING *`,
+      `UPDATE curso SET ${fields.join(", ")} WHERE id = $${index} RETURNING *`,
       values
     );
     return res.rows[0] || null;
@@ -123,5 +187,4 @@ export class TutorServices implements IUserServices {
       [claseId, participanteId]
     );
   }
-
 }

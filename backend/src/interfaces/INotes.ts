@@ -1,6 +1,7 @@
 export interface INote {
-  clase_id: number;
-  participante_id: number;
+  tutorId?: number; // Solo requerido en TutorService
+  claseId: number;
+  participanteId: number;
   nota: number;
   observaciones?: string;
 }

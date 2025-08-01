@@ -24,11 +24,9 @@ export class TutorController {
     res.status(200).json({ message: "Password changed successfully" });
   }
   async registrarAsistencia(req: Request, res: Response) {
-    const response = req.body;
-    // const claseId = response.clase_id;
-    // const asistencias = response.asistencias;
-    const { claseId, asistencias } = req.body;
-    await tutorServices.registrarAsistencia(claseId, asistencias);
+
+    const asistencia=req.body;
+    await tutorServices.registrarAsistencia(asistencia);
     res.status(200).json({ message: "Asistencias registradas" });
   }
 
@@ -37,7 +35,7 @@ export class TutorController {
     const response= req.params;
     const claseId = Number(req.params.clase_id);
     console.log("Notas:", nota);
-    await tutorServices.registrarNota(claseId, nota);
+    await tutorServices.registrarNota(nota);
     res.status(200).json({ message: "Notas registradas" });
   }
 
@@ -75,8 +73,8 @@ export class TutorController {
   }
 
   async updateNota(req: Request, res: Response) {
-    const { claseId, nota } = req.body;
-    await tutorServices.registrarNota(claseId, nota);
+    const nota  = req.body;
+    await tutorServices.registrarNota( nota);
     res.status(200).json({ message: "Nota actualizada" });
   }
 

@@ -1,6 +1,6 @@
 export interface IAttendance {
-  id: number;
-  participante_id: number;
-  course_id: number;
-  asistio: boolean;
+  tutorId?: number; // Solo requerido en TutorService
+  claseId: number;
+  participanteId: number;
+  presente: boolean;
 }

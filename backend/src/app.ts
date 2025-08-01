@@ -14,5 +14,5 @@ app.use('/culturapp/tutor', tutorRouter);
 app.use('/culturapp/calificacion', calificacionRouter);
 app.use('/culturapp/participante', participanteRouter);
 
-//TODO: Faltan los componentes de los participantes para que consulten sus notas y asistencias, revisar las vistas en el archivo db/views.sql
+
 export default app;
