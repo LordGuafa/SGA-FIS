@@ -15,7 +15,7 @@ participanteRouter.put(
     checkRole(3),
     participanteController.changePassword);
 
-participanteRouter.get('/:id/curso/:cursoId/notas', participanteController.getNotas);
+participanteRouter.get('/:id/curso/:cursoId/notas', participanteController.getCalificaciones);
 participanteRouter.get('/:id/curso/:cursoId/asistencias', participanteController.getAsistencias);
 participanteRouter.get('/:id/cursos', participanteController.listCursos);
 
