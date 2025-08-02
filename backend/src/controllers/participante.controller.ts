@@ -25,8 +25,8 @@ export class ParticipanteController {
     res.status(400).json({ message: "Failed to change password" });
   }
   async getCalificaciones(req: Request, res: Response) {
-    const participanteId = parseInt(req.params.par_id);
-    const cursoId = parseInt(req.params.curso_id);
+    const participanteId = parseInt(req.params.id);
+    const cursoId = parseInt(req.params.cursoId);
     const calificaciones = await service.getNotas(participanteId, cursoId);
     res.status(200).json(calificaciones);
   }
@@ -36,8 +36,8 @@ export class ParticipanteController {
     res.status(200).json(cursos);
   }
   async getAsistencias(req: Request, res: Response) {
-    const participanteId = parseInt(req.params.par_id);
-    const cursoId = parseInt(req.params.curso_id);
+    const participanteId = parseInt(req.params.id);
+    const cursoId = parseInt(req.params.cursoId);
     const asistencias = await service.getAsistencias(participanteId, cursoId);
     res.status(200).json(asistencias);
   }

@@ -30,10 +30,16 @@ export class TutorController {
   }
 
   async registrarNota(req: Request, res: Response) {
-    const nota = req.body;
-    const response= req.params;
     const claseId = Number(req.params.clase_id);
-    console.log("Notas:", nota);
+    const nota = {
+      tutorId: Number(req.params.tutor_id), // si lo estás pasando por URL
+      claseId,
+      participanteId: req.body.participante_id,
+      nota: req.body.nota,
+      observaciones: req.body.observacion,
+    };
+
+    console.log("Nota normalizada:", nota);
     await tutorServices.registrarNota(nota);
     res.status(200).json({ message: "Notas registradas" });
   }

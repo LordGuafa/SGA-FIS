@@ -58,44 +58,36 @@ export class TutorServices implements IUserServices {
   }
 
   async registrarAsistencia(data: IAttendance) {
-    const query = `
-      INSERT INTO asistencia (clase_id, participante_id, presente)
-      SELECT $2, $3, $4
-      FROM clase c
-      JOIN asignacion_tutor_curso atc ON atc.curso_id = c.curso_id
-      JOIN inscripcion i ON i.curso_id = c.curso_id AND i.participante_id = $3
-      WHERE c.id = $2
-        AND atc.tutor_id = $1
-        AND es_sincronico($3, c.curso_id) = true
-      ON CONFLICT (clase_id, participante_id)
-      DO UPDATE SET presente = EXCLUDED.presente
-    `;
-    await pool.query(query, [
-      data.tutorId,
+  const query = `
+    INSERT INTO asistencia (clase_id, participante_id, presente)
+    VALUES ($1, $2, $3)
+    ON CONFLICT (clase_id, participante_id)
+    DO UPDATE SET presente = EXCLUDED.presente
+    RETURNING *;
+  `;
+    const result = await pool.query(query, [
       data.claseId,
       data.participanteId,
       data.presente,
     ]);
+    console.log(result.rows);
   }
 
   async registrarNota(data: INote) {
-    const query = `
-      INSERT INTO calificacion (clase_id, participante_id, nota, observaciones)
-      SELECT $2, $3, $4, $5
-      FROM clase c
-      JOIN asignacion_tutor_curso atc ON atc.curso_id = c.curso_id
-      JOIN inscripcion i ON i.curso_id = c.curso_id AND i.participante_id = $3
-      WHERE c.id = $2 AND atc.tutor_id = $1
-      ON CONFLICT (clase_id, participante_id)
-      DO UPDATE SET nota = EXCLUDED.nota, observaciones = EXCLUDED.observaciones
+  const query = `
+    INSERT INTO calificacion (clase_id, participante_id, nota, observaciones)
+    VALUES ($1, $2, $3, $4)
+    ON CONFLICT (clase_id, participante_id)
+    DO UPDATE SET nota = EXCLUDED.nota, observaciones = EXCLUDED.observaciones
+    RETURNING *;
     `;
-    await pool.query(query, [
-      data.tutorId,
+    const result = await pool.query(query, [
       data.claseId,
       data.participanteId,
       data.nota,
       data.observaciones,
     ]);
+    console.log(result.rows);
   }
 
   async getClasesAsignadas(tutorId: number) {

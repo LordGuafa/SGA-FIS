@@ -14,7 +14,7 @@ tutorRouter.put("/change-password/:id", checkRole(2), tutorController.changePass
 
 // Asistencias
 tutorRouter.post("/asistencias", checkRole(2), tutorController.registrarAsistencia);
-tutorRouter.get("/:id/asistencias", checkRole(2), tutorController.getAsistencias);
+tutorRouter.get("/:id/:clase_id/asistencias", checkRole(2), tutorController.getAsistencias);
 tutorRouter.put("/asistencias/:id", checkRole(2), tutorController.updateAsistencia);
 tutorRouter.delete("/asistencias/:id", checkRole(2), tutorController.deleteAsistencia);
 
