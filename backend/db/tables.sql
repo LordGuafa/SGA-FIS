@@ -1,107 +1,124 @@
-CREATE DATABASE IF NOT EXISTS SGA;
-
--- Tabla de departamentos
-CREATE TABLE departamentos (
-    id SERIAL CONSTRAINT pk_departamentos PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL CONSTRAINT uq_departamentos_nombre UNIQUE
+-- Tabla de roles
+CREATE TABLE IF NOT EXISTS catalogo_rol (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(50) UNIQUE NOT NULL CHECK (
+        nombre IN ('administrativo', 'tutor', 'participante')
+    )
 );
 
--- Tabla de usuarios
-CREATE TABLE usuarios (
-    id SERIAL CONSTRAINT pk_usuarios PRIMARY KEY,
-    nombre_completo VARCHAR(150) NOT NULL,
-    email VARCHAR(100) NOT NULL CONSTRAINT uq_usuarios_email UNIQUE,
-    contraseña TEXT NOT NULL,
-    rol VARCHAR(20) NOT NULL,
-    CONSTRAINT chk_usuarios_rol CHECK (rol IN ('administrativo', 'tutor', 'participante'))
+-- Tabla de departamentos OCAD
+CREATE TABLE IF NOT EXISTS catalogo_departamento (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) UNIQUE NOT NULL,
+    codigo_ocad VARCHAR(20) NOT NULL,
+    region_ocad VARCHAR(100) NOT NULL
 );
 
--- Tabla de participantes
-CREATE TABLE participantes (
-    id_usuario INTEGER CONSTRAINT pk_participantes PRIMARY KEY,
-    departamento_id INTEGER NOT NULL,
-    CONSTRAINT fk_participantes_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE,
-    CONSTRAINT fk_participantes_departamento FOREIGN KEY (departamento_id) REFERENCES departamentos(id)
+-- Tabla de modalidades
+CREATE TABLE IF NOT EXISTS catalogo_modalidad (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(20) UNIQUE NOT NULL CHECK (
+        nombre IN ('sincronica', 'autonoma')
+    )
 );
 
--- Tabla de tutores
-CREATE TABLE tutores (
-    id_usuario INTEGER CONSTRAINT pk_tutores PRIMARY KEY,
-    CONSTRAINT fk_tutores_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE
-);
-
--- Tabla de cursos
-CREATE TABLE cursos (
-    id SERIAL CONSTRAINT pk_cursos PRIMARY KEY,
+-- Personal (administrativos y tutores)
+CREATE TABLE IF NOT EXISTS personal (
+    id INTEGER PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
-    descripcion TEXT,
-    modalidad VARCHAR(20) NOT NULL,
-    CONSTRAINT chk_cursos_modalidad CHECK (modalidad IN ('sincrónica', 'autónoma'))
-);
--- Relación entre tutores y cursos (para ambos tipos de modalidad)
-CREATE TABLE tutores_curso (
-    id SERIAL CONSTRAINT pk_tutores_curso PRIMARY KEY,
-    tutor_id INTEGER NOT NULL,
-    curso_id INTEGER NOT NULL,
-    CONSTRAINT fk_tutores_curso_tutor FOREIGN KEY (tutor_id) REFERENCES tutores(id_usuario) ON DELETE CASCADE,
-    CONSTRAINT fk_tutores_curso_curso FOREIGN KEY (curso_id) REFERENCES cursos(id) ON DELETE CASCADE,
-    CONSTRAINT uq_tutores_curso UNIQUE (tutor_id, curso_id)
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    contact1 VARCHAR(20),
+    contact2 VARCHAR(20),
+    rol_id INTEGER NOT NULL REFERENCES catalogo_rol(id) ON DELETE RESTRICT
 );
 
--- Avance de participantes en cursos autónomos
-CREATE TABLE avance_autonomo (
-    id SERIAL CONSTRAINT pk_avance_autonomo PRIMARY KEY,
-    participante_id INTEGER NOT NULL,
-    curso_id INTEGER NOT NULL,
-    porcentaje_avance NUMERIC(5,2) NOT NULL CHECK (porcentaje_avance BETWEEN 0 AND 100),
-    fecha_actualizacion DATE NOT NULL DEFAULT CURRENT_DATE,
-    observaciones TEXT,
-    CONSTRAINT fk_avance_autonomo_participante FOREIGN KEY (participante_id) REFERENCES participantes(id_usuario) ON DELETE CASCADE,
-    CONSTRAINT fk_avance_autonomo_curso FOREIGN KEY (curso_id) REFERENCES cursos(id) ON DELETE CASCADE,
-    CONSTRAINT uq_avance_autonomo UNIQUE (participante_id, curso_id)
+-- Participantes
+CREATE TABLE IF NOT EXISTS participante (
+    id INTEGER PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    contact1 VARCHAR(20),
+    contact2 VARCHAR(20),
+    departamento_id INTEGER NOT NULL REFERENCES catalogo_departamento(id) ON DELETE RESTRICT,
+    rol_id INTEGER NOT NULL REFERENCES catalogo_rol(id) ON DELETE RESTRICT,
+    activo BOOLEAN DEFAULT TRUE
+);
+
+-- Cursos
+CREATE TABLE IF NOT EXISTS curso (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT
+);
+
+-- NUEVA: Asignación de tutor a curso
+CREATE TABLE IF NOT EXISTS asignacion_tutor_curso (
+    id SERIAL PRIMARY KEY,
+    tutor_id INTEGER NOT NULL REFERENCES personal(id) ON DELETE CASCADE,
+    curso_id INTEGER NOT NULL REFERENCES curso(id) ON DELETE CASCADE,
+    fecha_asignacion DATE DEFAULT CURRENT_DATE,
+    UNIQUE (tutor_id, curso_id)
+);
+
+-- Clases
+CREATE TABLE IF NOT EXISTS clase (
+    id SERIAL PRIMARY KEY,
+    curso_id INTEGER NOT NULL REFERENCES curso(id) ON DELETE CASCADE,
+    tutor_id INTEGER NOT NULL REFERENCES personal(id) ON DELETE RESTRICT,
+    fecha DATE NOT NULL,
+    tema TEXT
 );
 
 -- Inscripciones
-CREATE TABLE inscripciones (
-    id SERIAL CONSTRAINT pk_inscripciones PRIMARY KEY,
-    participante_id INTEGER NOT NULL,
-    curso_id INTEGER NOT NULL,
-    fecha_inscripcion DATE NOT NULL DEFAULT CURRENT_DATE,
-    CONSTRAINT fk_inscripciones_participante FOREIGN KEY (participante_id) REFERENCES participantes(id_usuario) ON DELETE CASCADE,
-    CONSTRAINT fk_inscripciones_curso FOREIGN KEY (curso_id) REFERENCES cursos(id) ON DELETE CASCADE,
-    CONSTRAINT uq_inscripciones_participante_curso UNIQUE (participante_id, curso_id)
+CREATE TABLE IF NOT EXISTS inscripcion (
+    id SERIAL PRIMARY KEY,
+    curso_id INTEGER NOT NULL REFERENCES curso(id) ON DELETE CASCADE,
+    participante_id INTEGER NOT NULL REFERENCES participante(id) ON DELETE CASCADE,
+    modalidad_id INTEGER NOT NULL REFERENCES catalogo_modalidad(id) ON DELETE RESTRICT,
+    fecha_inscripcion DATE DEFAULT CURRENT_DATE,
+    UNIQUE (curso_id, participante_id)
 );
 
--- Clases (solo para cursos sincrónicos)
-CREATE TABLE clases (
-    id SERIAL CONSTRAINT pk_clases PRIMARY KEY,
-    curso_id INTEGER NOT NULL,
-    tutor_id INTEGER NOT NULL,
-    fecha DATE NOT NULL,
-    tema TEXT,
-    CONSTRAINT fk_clases_curso FOREIGN KEY (curso_id) REFERENCES cursos(id) ON DELETE CASCADE,
-    CONSTRAINT fk_clases_tutor FOREIGN KEY (tutor_id) REFERENCES tutores(id_usuario)
-    -- Nota: la validación de modalidad sincrónica se recomienda hacer con TRIGGERS
+-- Avance autónomo
+CREATE TABLE IF NOT EXISTS avance_autonomo (
+    id SERIAL PRIMARY KEY,
+    inscripcion_id INTEGER NOT NULL REFERENCES inscripcion(id) ON DELETE CASCADE,
+    descripcion TEXT,
+    fecha DATE DEFAULT CURRENT_DATE
 );
 
 -- Asistencia
-CREATE TABLE asistencias (
-    id SERIAL CONSTRAINT pk_asistencias PRIMARY KEY,
-    clase_id INTEGER NOT NULL,
-    participante_id INTEGER NOT NULL,
+CREATE TABLE IF NOT EXISTS asistencia (
+    id SERIAL PRIMARY KEY,
+    clase_id INTEGER NOT NULL REFERENCES clase(id) ON DELETE CASCADE,
+    participante_id INTEGER NOT NULL REFERENCES participante(id) ON DELETE CASCADE,
     presente BOOLEAN NOT NULL,
-    CONSTRAINT fk_asistencias_clase FOREIGN KEY (clase_id) REFERENCES clases(id) ON DELETE CASCADE,
-    CONSTRAINT fk_asistencias_participante FOREIGN KEY (participante_id) REFERENCES participantes(id_usuario) ON DELETE CASCADE
+    UNIQUE (clase_id, participante_id)
 );
 
--- Calificaciones
-CREATE TABLE calificaciones (
-    id SERIAL CONSTRAINT pk_calificaciones PRIMARY KEY,
-    participante_id INTEGER NOT NULL,
-    curso_id INTEGER NOT NULL,
-    nota NUMERIC(3,1) CONSTRAINT chk_calificaciones_nota CHECK (nota BETWEEN 0 AND 5),
-    fecha_registro DATE DEFAULT CURRENT_DATE,
-    CONSTRAINT fk_calificaciones_participante FOREIGN KEY (participante_id) REFERENCES participantes(id_usuario) ON DELETE CASCADE,
-    CONSTRAINT fk_calificaciones_curso FOREIGN KEY (curso_id) REFERENCES cursos(id) ON DELETE CASCADE,
-    CONSTRAINT uq_calificaciones_participante_curso UNIQUE (participante_id, curso_id)
+-- Calificación
+CREATE TABLE IF NOT EXISTS calificacion (
+    id SERIAL PRIMARY KEY,
+    clase_id INTEGER NOT NULL REFERENCES clase(id) ON DELETE CASCADE,
+    participante_id INTEGER NOT NULL REFERENCES participante(id) ON DELETE CASCADE,
+    nota NUMERIC(4, 2) CHECK (nota BETWEEN 0 AND 100),
+    observaciones TEXT,
+    UNIQUE (clase_id, participante_id)
 );
+
+-- Función para verificar si la inscripción es sincrónica
+CREATE OR REPLACE FUNCTION es_sincronico(p_participante_id INT, p_curso_id INT)
+RETURNS BOOLEAN AS $$
+DECLARE
+    modalidad_nombre TEXT;
+BEGIN
+    SELECT cm.nombre INTO modalidad_nombre
+    FROM inscripcion i
+    JOIN catalogo_modalidad cm ON cm.id = i.modalidad_id
+    WHERE i.participante_id = p_participante_id AND i.curso_id = p_curso_id;
+
+    RETURN modalidad_nombre = 'sincronica';
+END;
+$$ LANGUAGE plpgsql;

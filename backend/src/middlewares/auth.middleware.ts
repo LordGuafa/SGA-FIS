@@ -1,6 +1,6 @@
 import { expressjwt } from "express-jwt";
-
-const jwtSecret = process.env.JWT_SECRET;
+import { config } from "../config/config";
+const jwtSecret = config.JWT_SECRET;
 if (!jwtSecret) {
     throw new Error("JWT_SECRET environment variable is not defined");
 }
