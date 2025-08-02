@@ -78,7 +78,7 @@ WHERE es_sincronico(p.id, cu.id);
 
 CREATE OR REPLACE VIEW vista_participante_cursos AS
 SELECT
-
+    p.id AS participante_id,
     cu.nombre AS curso_nombre,
     cu.descripcion AS curso_descripcion,
     cm.nombre AS modalidad
@@ -207,4 +207,4 @@ JOIN personal per ON per.id = atc.tutor_id
 JOIN curso c ON c.id = atc.curso_id
 ORDER BY per.nombre, c.nombre;
 
-select * from vista_notas_participante where participante_id=3001
+SELECT * FROM vista_asistencias_participante
