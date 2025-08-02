@@ -15,9 +15,9 @@ participanteRouter.put(
     checkRole(3),
     participanteController.changePassword);
 
-participanteRouter.get('/', calificacionController.getCalificaciones);
-participanteRouter.get('/:id', calificacionController.getAsistencias);
-participanteRouter.get('/cursos/:id', calificacionController.listCursos);
+participanteRouter.get('/:id/curso/:cursoId/calificaciones', participanteController.getCalificaciones);
+participanteRouter.get('/:id/curso/:cursoId/asistencias', participanteController.getAsistencias);
+participanteRouter.get('/:id/cursos', participanteController.listCursos);
 
 //TODO implementar los endpoints
 // Estudiantes (rol 3) pueden ver sus propias calificaciones

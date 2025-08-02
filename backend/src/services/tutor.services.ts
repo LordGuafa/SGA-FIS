@@ -137,7 +137,7 @@ export class TutorServices implements IUserServices {
     }
     values.push(id);
     const res = await pool.query(
-      `UPDATE participante SET ${fields.join(
+      `UPDATE clase SET ${fields.join(
         ", "
       )} WHERE id = $${index} RETURNING *`,
       values
@@ -166,16 +166,13 @@ export class TutorServices implements IUserServices {
   }
 
   async updateAsistencia(id: number, estado: string): Promise<void> {
-    await pool.query(`UPDATE asistencias SET estado = $1 WHERE id = $2`, [
+    await pool.query(`UPDATE asistencia SET presente = $1 WHERE id = $2`, [
       estado,
       id,
     ]);
   }
 
-  async deleteAsistencia(
-    claseId: number,
-    participanteId: number
-  ): Promise<void> {
+  async deleteAsistencia(claseId: number, participanteId: number): Promise<void> {
     await pool.query(
       "DELETE FROM asistencia WHERE clase_id = $1 AND participante_id = $2",
       [claseId, participanteId]

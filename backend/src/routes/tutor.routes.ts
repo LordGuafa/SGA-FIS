@@ -20,14 +20,14 @@ tutorRouter.delete("/asistencias/:id", checkRole(2), tutorController.deleteAsist
 
 // Notas
 tutorRouter.post("/:id/:clase_id/notas", checkRole(2), tutorController.registrarNota);
-tutorRouter.get("/:id/notas", checkRole(2), tutorController.getCalificaciones);
+tutorRouter.get("/:id/:clase_id/notas", checkRole(2), tutorController.getCalificaciones);
 tutorRouter.put("/notas/:id", checkRole(2), tutorController.updateNota);
-tutorRouter.delete("/notas/:id", checkRole(2), tutorController.deleteNota);
+tutorRouter.delete("/notas/:claseId/:participanteId", checkRole(2), tutorController.deleteNota);
 
 // Clases
 tutorRouter.post("/clases", checkRole(2), tutorController.createClass);
-tutorRouter.get("/clases", checkRole(2), tutorController.listClasses);
-tutorRouter.get("/clases/:id", checkRole(2), tutorController.getClassById);
+// tutorRouter.get("/clases/:id", checkRole(2), tutorController.getClassById);
+tutorRouter.get("/clases/:id", checkRole(2), tutorController.getClasses);
 tutorRouter.put("/clases/:id", checkRole(2), tutorController.updateClass);
 tutorRouter.delete("/clases/:id", checkRole(2), tutorController.deleteClass);
 

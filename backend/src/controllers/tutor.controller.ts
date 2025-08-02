@@ -99,8 +99,9 @@ export class TutorController {
   }
 
   async getCalificaciones(req: Request, res: Response) {
-    const response = req.body;
-    const tutorId = response.tutorId;
+    const response = req.params;
+    const tutorId = Number(response.id);
+    console.log("Tutor ID:", tutorId);
     const calificaciones = await tutorServices.getCalificaciones(tutorId);
     if (!calificaciones) {
       return res.status(404).json({ message: "No calificaciones found" });
