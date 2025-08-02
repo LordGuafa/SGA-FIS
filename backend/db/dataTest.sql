@@ -16,6 +16,7 @@ INSERT INTO catalogo_modalidad (nombre) VALUES
 
 -- Personal (IDs son el documento)
 INSERT INTO personal (id, nombre, email, password, contact1, contact2, rol_id) VALUES
+
 (1001, 'Ana Admin', 'ana.admin@sga.com', '$2b$10$fT9pk4.6KGSUoxTUWNn39uZlqMpZEgi6uj64ETL7.XqNAO6dZrW6G', '3001111111', '3102222222', 1),
 (2001, 'Carlos Tutor', 'carlos.tutor@sga.com', '$2b$10$fT9pk4.6KGSUoxTUWNn39uZlqMpZEgi6uj64ETL7.XqNAO6dZrW6G', '3013333333', NULL, 2);
 
